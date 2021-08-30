@@ -1,15 +1,12 @@
 package com.example.blower2
 
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.media.AudioFormat
 import android.Manifest
 import android.content.pm.PackageManager
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.os.Build
-import android.os.Environment
-import android.os.Process
+import android.os.*
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Button
@@ -39,6 +36,11 @@ import kotlin.collections.ArrayList
 import com.example.blower2.audio.features.MFCC
 import com.example.blower2.audio.features.WavFile
 import com.example.blower2.audio.features.WavFileException
+import kotlin.system.measureTimeMillis
+import android.util.TimingLogger
+
+
+
 
 class MainActivity : AppCompatActivity() {
     private var startButton: Button? = null
@@ -48,19 +50,41 @@ class MainActivity : AppCompatActivity() {
     var recordingBufferClean = ShortArray(MainActivity.RECORDING_LENGTH-960)
     var recordingOffset = 0
     var shouldContinue = true
-    private var recordingThread: Thread? = null
+    private var recordingThread: HandlerThread = HandlerThread("recordingThread")
+    private var recordingHandler: Handler? = null
     var shouldContinueRecognition = true
-    private var recognitionThread: Thread? = null
-    private val recordingBufferLock = ReentrantLock()
+    private var recognitionThread: HandlerThread = HandlerThread("recognitionThread")
+    private var recognitionHandler: Handler? = null
+    private var recordingBufferLock = ReentrantLock()
+
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         startButton = findViewById<View>(R.id.start) as Button?
-        startButton!!.setOnClickListener { startRecording() }
+        startButton!!.setOnClickListener {
+
+                startRecording()
+
+
+
+        }
         outputText = findViewById<View>(R.id.output_text) as TextView?
         requestMicrophonePermission();
+        recordingThread.start()
+        recordingHandler = Handler(recordingThread.looper)
+
+
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        recordingThread.quit()
+        recognitionThread.quit()
+
     }
     @RequiresApi(Build.VERSION_CODES.M)
     private fun requestMicrophonePermission() {
@@ -78,26 +102,35 @@ class MainActivity : AppCompatActivity() {
     }
     @Synchronized
     fun startRecording() {
-        if (recordingThread != null) {
+        /*if (recordingThread != null) {
             return
-        }
+        }*/
         shouldContinue = true
-        recordingThread = Thread { record() }
-        recordingThread!!.start()
+        recordingHandler?.post {
+            val timeR = measureTimeMillis {
+            record()
+            }
+            Log.v(MainActivity.LOG_TAG, "This took:$timeR")
+
+        }
     }
+
     private fun record() {
-        Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO)
+        //recordingBuffer = ShortArray(MainActivity.RECORDING_LENGTH)
+        //recordingBufferClean = ShortArray(MainActivity.RECORDING_LENGTH-960)
+
 
         // Estimate the buffer size we'll need for this device.
         var bufferSize: Int = AudioRecord.getMinBufferSize(
             MainActivity.SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
         )
-        Log.v(MainActivity.LOG_TAG, "Min buffer size:$bufferSize")
+        //Log.v(MainActivity.LOG_TAG, "Min buffer size:$bufferSize")
         if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE) {
-            bufferSize = SAMPLE_RATE * 2;
+            bufferSize = 1280
+        //bufferSize = SAMPLE_RATE * 2;
         }
-        val audioBuffer = ShortArray(bufferSize /4)
-        val record = AudioRecord(
+        var audioBuffer = ShortArray(bufferSize /4)
+        var record = AudioRecord(
             MediaRecorder.AudioSource.DEFAULT,
             MainActivity.SAMPLE_RATE,
             AudioFormat.CHANNEL_IN_MONO,
@@ -109,10 +142,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
         record.startRecording()
-        Log.v(MainActivity.LOG_TAG, "Start recording")
+        //Log.v(MainActivity.LOG_TAG, "Start recording")
         while (shouldContinue) {
-            val numberRead: Int = record.read(audioBuffer, 0, audioBuffer.size)
-            Log.v(MainActivity.LOG_TAG, "read: $numberRead")
+            var numberRead: Int = record.read(audioBuffer, 0, audioBuffer.size)
+            //Log.v(MainActivity.LOG_TAG, "read: $numberRead")
             val maxLength = recordingBuffer.size
             recordingBufferLock.lock()
             try {
@@ -123,10 +156,15 @@ class MainActivity : AppCompatActivity() {
                 }
                 recordingOffset += numberRead
             } finally {
-                recordingBufferClean = recordingBuffer.sliceArray(479..2078)
+
                 recordingBufferLock.unlock()
             }
         }
+        recordingOffset =0
+        recordingBufferLock.lock()
+        recordingBufferClean = recordingBuffer.sliceArray(479..2078)
+        recordingBufferLock.unlock()
+       // Log.v("TAG",Arrays.toString(recordingBufferClean))
         record.stop()
         record.release()
         startRecognition()
@@ -134,18 +172,16 @@ class MainActivity : AppCompatActivity() {
 
     @Synchronized
     fun startRecognition() {
-        Log.v(LOG_TAG, "We are recognizing your data")
-        if (recognitionThread != null) {
-            return
-        }
-        shouldContinueRecognition = true
-        recognitionThread = Thread { recognize() }
-        recognitionThread!!.start()
+       // Log.v(LOG_TAG, "We are recognizing your data")
+
+            recognize()
+
+
 
     }
 
     private fun recognize() {
-        Log.v(LOG_TAG, "Start recognition")
+       // Log.v(LOG_TAG, "Start recognition")
         val inputBuffer = ShortArray(1600)
         val doubleInputBuffer = DoubleArray(1600)
         val outputScores = LongArray(157)
@@ -163,15 +199,16 @@ class MainActivity : AppCompatActivity() {
         for (i in 0 until 1600) {
             doubleInputBuffer[i] = inputBuffer[i]/ 32767.0;
         }
-        Log.v(LOG_TAG, "RECORDING Obtained")
+       // Log.v(LOG_TAG, "RECORDING Obtained")
         val result= classifyNoise(doubleInputBuffer)
+       Log.v(LOG_TAG, result.toString())
 
 
-        this@MainActivity.runOnUiThread(java.lang.Runnable {
-            this.output_text.text = "Predicted Noise : $result"
-        })
+       // this@MainActivity.runOnUiThread(java.lang.Runnable {
+          //  this.output_text.text = "Predicted Noise : $result"
+       // })
 
-        Log.v(LOG_TAG, "Clasify DONE")
+       // Log.v(LOG_TAG, "Clasify DONE")
 
     }
 
@@ -254,9 +291,9 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
-        Log.d("TAG",Arrays.toString(flattenMFCCValues))
+       // Log.d("TAG",Arrays.toString(flattenMFCCValues))
         predictedResult = loadModelAndMakePredictions( flattenMFCCValues)
-        Log.d("TAG","What is this")
+
         return predictedResult
     }
 
@@ -264,13 +301,15 @@ class MainActivity : AppCompatActivity() {
     protected fun loadModelAndMakePredictions(flatMFCCValues :
                                               FloatArray) : String? {
 
+
         var predictedResult: String? = "unknown"
+
         //load the TFLite model in 'MappedByteBuffer' format using TF Interpreter
         val tfliteModel: MappedByteBuffer =
             FileUtil.loadMappedFile(this, getModelPath())
         val tflite: Interpreter
         /** Options for configuring the Interpreter.  */
-        val tfliteOptions =
+        val tfliteOptions:Interpreter.Options =
             Interpreter.Options()
         tfliteOptions.setNumThreads(2)
         tflite = Interpreter(tfliteModel, tfliteOptions)
@@ -284,6 +323,8 @@ class MainActivity : AppCompatActivity() {
             tflite.getOutputTensor(probabilityTensorIndex).shape()
         val probabilityDataType: DataType =
             tflite.getOutputTensor(probabilityTensorIndex).dataType()
+
+
         //need to transform the MFCC 1d float buffer into 1x40x1x1 dimension tensor using TensorBuffer
         val inBuffer: TensorBuffer = TensorBuffer.createDynamic(imageDataType)
         inBuffer.loadArray(flatMFCCValues, imageShape)
@@ -293,6 +334,9 @@ class MainActivity : AppCompatActivity() {
         //run the predictions with input and output buffer tensors to get probability values across the labels
         tflite.run(inpBuffer, outputTensorBuffer.getBuffer())
 
+        //Log.d("TAG",getMaxValue(outputTensorBuffer.floatArray ).toString() )
+
+/*
         //Code to transform the probability predictions into label values
         val ASSOCIATED_AXIS_LABELS = "labels.txt"
         var associatedAxisLabels: List<String?>? = null
@@ -319,16 +363,26 @@ class MainActivity : AppCompatActivity() {
             //function to retrieve the top K probability values, in this case 'k' value is 1.
             //retrieved values are storied in 'Recognition' object with label details.
             val resultPrediction: List<Recognition>? = getTopKProbability(floatMap);
-
+*/
             //get the top 1 prediction from the retrieved list of top predictions
-            predictedResult = getPredictedValue(resultPrediction)
+            predictedResult = getMaxValue(outputTensorBuffer.floatArray ).toString()
 
-        }
+      //  }
 
 
 
 
         return predictedResult
+    }
+    fun getMaxValue(floatArray: FloatArray): Int{
+        var index: Int=0
+        if(floatArray[1]>floatArray[0]){
+            index = 1
+        }
+        else{
+            index = 0
+        }
+        return index
     }
     fun getPredictedValue(predictedList:List<Recognition>?): String?{
         val top1PredictedValue : Recognition? = predictedList?.get(0)
