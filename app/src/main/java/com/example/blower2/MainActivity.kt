@@ -1,29 +1,27 @@
 package com.example.blower2
 
-import androidx.appcompat.app.AppCompatActivity
-import android.media.AudioFormat
+
 import android.Manifest
 import android.content.pm.PackageManager
+import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.*
-import android.text.TextUtils
 import android.util.Log
-import android.widget.Button
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.HandlerCompat
+import com.example.blower2.audio.features.MFCC
+import com.example.blower2.audio.features.WavFile
+import com.example.blower2.audio.features.WavFileException
 import kotlinx.android.synthetic.main.activity_main.*
-
-
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
-import org.tensorflow.lite.support.common.TensorProcessor
-import org.tensorflow.lite.support.common.ops.NormalizeOp
-import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
-import java.io.File
 import java.io.IOException
 import java.math.RoundingMode
 import java.nio.ByteBuffer
@@ -32,14 +30,7 @@ import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.collections.ArrayList
-
-import com.example.blower2.audio.features.MFCC
-import com.example.blower2.audio.features.WavFile
-import com.example.blower2.audio.features.WavFileException
 import kotlin.system.measureTimeMillis
-import android.util.TimingLogger
-
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -56,6 +47,19 @@ class MainActivity : AppCompatActivity() {
     private var recognitionThread: HandlerThread = HandlerThread("recognitionThread")
     private var recognitionHandler: Handler? = null
     private var recordingBufferLock = ReentrantLock()
+    private var tfLiteLock = ReentrantLock()
+
+    lateinit var  tfliteModel: MappedByteBuffer
+     var tflite: Interpreter? = null
+    /** Options for configuring the Interpreter.  */
+    val tfliteOptions: Interpreter.Options = Interpreter.Options()
+
+    val imageTensorIndex = 0
+    var imageShape : IntArray? = null
+    lateinit var imageDataType: DataType
+    val probabilityTensorIndex = 0
+    var probabilityShape : IntArray? = null
+    lateinit var probabilityDataType: DataType
 
 
 
@@ -66,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         startButton = findViewById<View>(R.id.start) as Button?
         startButton!!.setOnClickListener {
 
-                startRecording()
+                    startRecording()
 
 
 
@@ -74,8 +78,17 @@ class MainActivity : AppCompatActivity() {
         outputText = findViewById<View>(R.id.output_text) as TextView?
         requestMicrophonePermission();
         recordingThread.start()
-        recordingHandler = Handler(recordingThread.looper)
+        recordingHandler = HandlerCompat.createAsync(recordingThread.looper)
 
+        //lOAD mODEL
+        tfliteOptions.setNumThreads(1)
+        tfliteModel = FileUtil.loadMappedFile(this, getModelPath())
+        recreateInterpreter()
+
+        imageShape = tflite!!.getInputTensor(imageTensorIndex)?.shape()
+        imageDataType= tflite!!.getInputTensor(imageTensorIndex)!!.dataType()
+        probabilityShape = tflite!!.getOutputTensor(probabilityTensorIndex).shape()
+        probabilityDataType= tflite!!.getOutputTensor(probabilityTensorIndex).dataType()
 
 
     }
@@ -106,13 +119,43 @@ class MainActivity : AppCompatActivity() {
             return
         }*/
         shouldContinue = true
-        recordingHandler?.post {
-            val timeR = measureTimeMillis {
-            record()
-            }
-            Log.v(MainActivity.LOG_TAG, "This took:$timeR")
 
+
+           /* recordingHandler?.postDelayed({
+
+                val timeR = measureTimeMillis {
+                    record()
+                }
+                Log.v(MainActivity.LOG_TAG, "This took:$timeR")
+
+
+            },5)*/
+
+        //Here Starts the code
+
+        // Define the classification runnable
+        val run = object : Runnable {
+            override fun run() {
+                val startTime = System.currentTimeMillis()
+                record()
+                val finishTime = System.currentTimeMillis()
+
+                Log.d(LOG_TAG, "Latency = ${finishTime - startTime}ms")
+                //recordingHandler?.postDelayed(this, 5)
+
+
+            }
         }
+
+// Start the classification process
+        recordingHandler?.post(run)
+
+
+
+
+
+
+
     }
 
     private fun record() {
@@ -162,11 +205,20 @@ class MainActivity : AppCompatActivity() {
         }
         recordingOffset =0
         recordingBufferLock.lock()
+
+
         recordingBufferClean = recordingBuffer.sliceArray(479..2078)
+
+
+
         recordingBufferLock.unlock()
        // Log.v("TAG",Arrays.toString(recordingBufferClean))
         record.stop()
         record.release()
+
+
+
+
         startRecognition()
     }
 
@@ -181,6 +233,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun recognize() {
+
+
+
+
        // Log.v(LOG_TAG, "Start recognition")
         val inputBuffer = ShortArray(1600)
         val doubleInputBuffer = DoubleArray(1600)
@@ -195,6 +251,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+
         // signed 16-bit inputs.
         for (i in 0 until 1600) {
             doubleInputBuffer[i] = inputBuffer[i]/ 32767.0;
@@ -202,6 +259,7 @@ class MainActivity : AppCompatActivity() {
        // Log.v(LOG_TAG, "RECORDING Obtained")
         val result= classifyNoise(doubleInputBuffer)
        Log.v(LOG_TAG, result.toString())
+
 
 
        // this@MainActivity.runOnUiThread(java.lang.Runnable {
@@ -233,20 +291,24 @@ class MainActivity : AppCompatActivity() {
 
             ///////PROBLEM CODE
             //trimming the magnitude values to 5 decimal digits
-            val df = DecimalFormat("#.#####")
-            df.roundingMode = RoundingMode.CEILING
-            val meanBuffer = DoubleArray(mNumFrames)
-            for (q in 0 until mNumFrames) {
+            //val df = DecimalFormat("#.#####")
+            //df.roundingMode = RoundingMode.CEILING
+            //val meanBuffer = DoubleArray(mNumFrames)
 
-                meanBuffer[q] = df.format(doubleInputBuffer[q]).replace(',','.').toDouble()
-            }
+
+
+            //for (q in 0 until mNumFrames) {
+
+                //meanBuffer[q] = df.format(doubleInputBuffer[q]).replace(',','.').toDouble()
+            //}
+
 
             //MFCC java library.
             val mfccConvert = MFCC()
             //mfccConvert.setSampleRate(16000)
             val nMFCC = 20
             //mfccConvert.setN_mfcc(nMFCC)
-            val mfccInput = mfccConvert.process(meanBuffer)
+            val mfccInput = mfccConvert.process(doubleInputBuffer)
             //predictedResult = Arrays.toString(mfccInput)
             val nFFT = mfccInput.size / nMFCC
 
@@ -292,7 +354,12 @@ class MainActivity : AppCompatActivity() {
         }
 
        // Log.d("TAG",Arrays.toString(flattenMFCCValues))
+
+
+
         predictedResult = loadModelAndMakePredictions( flattenMFCCValues)
+
+
 
         return predictedResult
     }
@@ -303,36 +370,42 @@ class MainActivity : AppCompatActivity() {
 
 
         var predictedResult: String? = "unknown"
-
+            /*
         //load the TFLite model in 'MappedByteBuffer' format using TF Interpreter
         val tfliteModel: MappedByteBuffer =
             FileUtil.loadMappedFile(this, getModelPath())
         val tflite: Interpreter
         /** Options for configuring the Interpreter.  */
-        val tfliteOptions:Interpreter.Options =
+        val tfliteOptions: Interpreter.Options =
             Interpreter.Options()
         tfliteOptions.setNumThreads(2)
         tflite = Interpreter(tfliteModel, tfliteOptions)
+*/
         //obtain the input and output tensor size required by the model
         //for urban sound classification, input tensor should be of 1x40x1x1 shape
-        val imageTensorIndex = 0
-        val imageShape = tflite.getInputTensor(imageTensorIndex).shape()
-        val imageDataType: DataType = tflite.getInputTensor(imageTensorIndex).dataType()
+
+
+
+      /*  val imageTensorIndex = 0
+        val imageShape = tflite!!.getInputTensor(imageTensorIndex)?.shape()
+        val imageDataType: DataType = tflite!!.getInputTensor(imageTensorIndex)!!.dataType()
         val probabilityTensorIndex = 0
         val probabilityShape =
-            tflite.getOutputTensor(probabilityTensorIndex).shape()
+            tflite!!.getOutputTensor(probabilityTensorIndex).shape()
         val probabilityDataType: DataType =
-            tflite.getOutputTensor(probabilityTensorIndex).dataType()
+            tflite!!.getOutputTensor(probabilityTensorIndex).dataType()
 
-
+*/
         //need to transform the MFCC 1d float buffer into 1x40x1x1 dimension tensor using TensorBuffer
         val inBuffer: TensorBuffer = TensorBuffer.createDynamic(imageDataType)
-        inBuffer.loadArray(flatMFCCValues, imageShape)
+        if (imageShape != null) {
+            inBuffer.loadArray(flatMFCCValues, imageShape!!)
+        }
         val inpBuffer: ByteBuffer = inBuffer.getBuffer()
         val outputTensorBuffer: TensorBuffer =
-            TensorBuffer.createFixedSize(probabilityShape, probabilityDataType)
+            TensorBuffer.createFixedSize(probabilityShape!!, probabilityDataType)
         //run the predictions with input and output buffer tensors to get probability values across the labels
-        tflite.run(inpBuffer, outputTensorBuffer.getBuffer())
+        tflite!!.run(inpBuffer, outputTensorBuffer.getBuffer())
 
         //Log.d("TAG",getMaxValue(outputTensorBuffer.floatArray ).toString() )
 
@@ -374,6 +447,22 @@ class MainActivity : AppCompatActivity() {
 
         return predictedResult
     }
+
+    private fun recreateInterpreter() {
+        tfLiteLock.lock()
+        try {
+            if (tflite != null) {
+                tflite!!.close()
+                tflite = null
+            }
+            tflite = Interpreter(tfliteModel, tfliteOptions)
+
+        } finally {
+            tfLiteLock.unlock()
+        }
+    }
+
+
     fun getMaxValue(floatArray: FloatArray): Int{
         var index: Int=0
         if(floatArray[1]>floatArray[0]){
@@ -384,10 +473,7 @@ class MainActivity : AppCompatActivity() {
         }
         return index
     }
-    fun getPredictedValue(predictedList:List<Recognition>?): String?{
-        val top1PredictedValue : Recognition? = predictedList?.get(0)
-        return top1PredictedValue?.getTitle()
-    }
+
     fun getModelPath(): String {
         // you can download this file from
         // see build.gradle for where to obtain this file. It should be auto
@@ -395,24 +481,7 @@ class MainActivity : AppCompatActivity() {
         return "model.tflite"
     }
     /** Gets the top-k results.  */
-    protected fun getTopKProbability(labelProb: Map<String, Float>): List<Recognition>? {
-        // Find the best classifications.
-        val MAX_RESULTS: Int = 1
-        val pq: PriorityQueue<Recognition> = PriorityQueue(
-            MAX_RESULTS,
-            Comparator<Recognition> { lhs, rhs -> // Intentionally reversed to put high confidence at the head of the queue.
-                java.lang.Float.compare(rhs.getConfidence(), lhs.getConfidence())
-            })
-        for (entry in labelProb.entries) {
-            pq.add(Recognition("" + entry.key, entry.key, entry.value))
-        }
-        val recognitions: ArrayList<Recognition> = ArrayList()
-        val recognitionsSize: Int = Math.min(pq.size, MAX_RESULTS)
-        for (i in 0 until recognitionsSize) {
-            recognitions.add(pq.poll())
-        }
-        return recognitions
-    }
+
 
     companion object {
         // Constants that control the behavior of the recognition code and model
