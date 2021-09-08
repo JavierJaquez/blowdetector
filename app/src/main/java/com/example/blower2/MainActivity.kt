@@ -3,20 +3,25 @@ package com.example.blower2
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.blower2.audio.features.MFCC
-import com.example.blower2.audio.features.WavFile
 import com.example.blower2.audio.features.WavFileException
+import kotlinx.android.synthetic.main.activity_main.*
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
@@ -28,8 +33,22 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var startButton: Button? = null
+    private var stopButton: Button? = null
+    private var oneButton : Button? = null
+    private var twoButton : Button? = null
+
+    private var b1 : Button? = null
+    private var b2 : Button? = null
+    private var b3 : Button? = null
+    private var b4 : Button? = null
+    private var b5 : Button? = null
+    private var b6 : Button? = null
+    private var b7 : Button? = null
+    private var b8: Button? = null
+
+
     private var outputText: TextView? = null
     // Working variables.
     var recordingBuffer = ShortArray(MainActivity.RECORDING_LENGTH)
@@ -40,7 +59,8 @@ class MainActivity : AppCompatActivity() {
     //private var recordingHandler: Handler? = null
     var shouldContinueRecognition = true
     private var  recognitionThread: Thread? = null
-   // private var recognitionHandler: Handler? = null
+    private var mHandler :Handler? = null
+    // private var recognitionHandler: Handler? = null
     private var recordingBufferLock = ReentrantLock()
     private var tfLiteLock = ReentrantLock()
 
@@ -57,6 +77,19 @@ class MainActivity : AppCompatActivity() {
     lateinit var probabilityDataType: DataType
 
 
+    // APP VARIABLE
+    var currentButtonToPress: Int = 1
+    var lastButtonPressed: Int = 0
+    var pressedButton: Button? = null
+
+
+    //BUTTON CONFIG
+    val PURPLE= 0
+    val GREEN = 1
+
+    val buttondelay: Long= 500// in Milliseconds
+
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,8 +104,57 @@ class MainActivity : AppCompatActivity() {
 
 
         }
+
+        stopButton = findViewById<View>(R.id.stop) as Button?
+        stopButton!!.setOnClickListener {
+
+            stopRecording()
+            stopRecognition()
+
+
+
+        }
+
+        oneButton = findViewById<View>(R.id.one) as Button
+        oneButton!!.setOnTouchListener(this)
+        twoButton = findViewById<View>(R.id.two) as Button
+        twoButton!!.setOnTouchListener(this)
+
+        b1 = findViewById<View>(R.id.b1) as Button
+        b1!!.setOnTouchListener(this)
+        b2 = findViewById<View>(R.id.b2) as Button
+        b2!!.setOnTouchListener(this)
+        b3 = findViewById<View>(R.id.b3) as Button
+        b3!!.setOnTouchListener(this)
+        b4 = findViewById<View>(R.id.b4) as Button
+        b4!!.setOnTouchListener(this)
+        b5 = findViewById<View>(R.id.b5) as Button
+        b5!!.setOnTouchListener(this)
+        b6 = findViewById<View>(R.id.b6) as Button
+        b6!!.setOnTouchListener(this)
+        b7 = findViewById<View>(R.id.b7) as Button
+        b7!!.setOnTouchListener(this)
+        b8 = findViewById<View>(R.id.b8) as Button
+        b8!!.setOnTouchListener(this)
+
+
+
         outputText = findViewById<View>(R.id.output_text) as TextView?
         requestMicrophonePermission();
+
+        mHandler = object : Handler() {
+            override fun handleMessage(msg: Message) {
+                // TODO Auto-generated method stub
+                when (msg.what) {
+
+                    PURPLE -> {
+                        pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238))
+                        //mHandler?.sendEmptyMessageDelayed(YELLOW, buttondelay)
+                    }
+
+                }
+            }
+        }
 
 
         //lOAD mODEL
@@ -85,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         probabilityShape = tflite!!.getOutputTensor(probabilityTensorIndex).shape()
         probabilityDataType= tflite!!.getOutputTensor(probabilityTensorIndex).dataType()
 
-        recordingThread?.start()
+        //recordingThread?.start()
         //recordingHandler = HandlerCompat.createAsync(recordingThread.looper)
 
 
@@ -93,9 +175,64 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-       // recordingThread.quit()
-      //  recognitionThread.quit()
+        stopRecording()
+        stopRecognition()
 
+
+
+    }
+
+    override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
+        when (view) {
+            oneButton -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.x
+                        var yCoord = motionEvent.y
+                        lastButtonPressed = 1
+                        pressedButton =oneButton
+                        pressedButton?.setBackgroundColor(Color.rgb(187, 134, 252))
+                        Log.d(LOG_TAG, xCoord.toString())
+                        Log.d(LOG_TAG, yCoord.toString())
+
+
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+
+            twoButton -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.x
+                        var yCoord = motionEvent.y
+                        lastButtonPressed = 2
+                        pressedButton =twoButton
+                        pressedButton?.setBackgroundColor(Color.rgb(187, 134, 252))
+                        Log.d(LOG_TAG, xCoord.toString())
+                        Log.d(LOG_TAG, yCoord.toString())
+
+
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+
+
+
+
+
+
+
+        }
+
+        return true
     }
     @RequiresApi(Build.VERSION_CODES.M)
     private fun requestMicrophonePermission() {
@@ -264,6 +401,21 @@ class MainActivity : AppCompatActivity() {
 
 
             Log.v(LOG_TAG, result.toString())
+
+            if(result == "1"){
+                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                    if(currentButtonToPress == lastButtonPressed) {
+                        pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
+                        mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
+                        lastButtonPressed = 0
+                        if(currentButtonToPress ==1){
+                            currentButtonToPress = 2
+                        }else{
+                            currentButtonToPress = 1
+                        }
+                    }
+                })
+            }
 
         }
     }

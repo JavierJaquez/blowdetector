@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -31,14 +32,123 @@
             android:layout_marginTop="10dp"
             android:textAlignment="center"
             android:textSize="24dp" />
+
+        <Button
+            android:id="@+id/start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:text="start" />
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:text="stop" />
+
+        <Button
+            android:id="@+id/one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:text="one" />
+        <Button
+            android:id="@+id/two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="10dp"
+
+            android:text="two" />
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="10dp"
-        android:text="start" />
+        <io.github.francoiscampbell.circlelayout.CircleLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:cl_direction="clockwise"
+            >
 
-</FrameLayout>
+            <Button
+                android:id="@+id/b1"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+            <Button
+                android:id="@+id/b2"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+            <Button
+                android:id="@+id/b3"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+            <Button
+                android:id="@+id/b4"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+            <Button
+                android:id="@+id/b5"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+            <Button
+                android:id="@+id/b6"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+            <Button
+                android:id="@+id/b7"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+            <Button
+                android:id="@+id/b8"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+
+                android:text=""
+                android:background="@drawable/circular_button"
+
+                />
+
+
+        </io.github.francoiscampbell.circlelayout.CircleLayout>
+    </LinearLayout>
+</LinearLayout>
