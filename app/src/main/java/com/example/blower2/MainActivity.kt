@@ -1,21 +1,21 @@
-package com.example.blower2
+package com. example.blower2
 
 
 import android.Manifest
+import android.R.attr
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.Point
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +31,13 @@ import java.nio.ByteBuffer
 import java.nio.MappedByteBuffer
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
+import android.R.attr.button
+import android.R.attr.width
+import android.graphics.Color.rgb
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
+import android.graphics.LightingColorFilter
+import android.graphics.PorterDuff
 
 
 class MainActivity : AppCompatActivity(), View.OnTouchListener {
@@ -47,6 +54,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var b6 : Button? = null
     private var b7 : Button? = null
     private var b8: Button? = null
+
+    private val buttonsIds = listOf(R.id.b1,R.id.b2,R.id.b3,R.id.b4,R.id.b5,R.id.b6,R.id.b7,R.id.b8)
+    private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6)
+    private var buttons:ArrayList<Button>? = null
+    private var counter : Int = 0
+    private var counter2 : Int = 0
+    private val widthOrder = arrayOf(100,80,60)
 
 
     private var outputText: TextView? = null
@@ -78,7 +92,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
     // APP VARIABLE
-    var currentButtonToPress: Int = 1
+    var currentButtonToPress: Int = 0
     var lastButtonPressed: Int = 0
     var pressedButton: Button? = null
 
@@ -139,6 +153,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
 
+
         outputText = findViewById<View>(R.id.output_text) as TextView?
         requestMicrophonePermission();
 
@@ -171,6 +186,25 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         //recordingHandler = HandlerCompat.createAsync(recordingThread.looper)
 
 
+
+        //buttons = ArrayList<Button>(buttonsIds.size)
+
+  /*      for (id in buttonsIds) {
+            val button = findViewById<View>(id) as Button
+             //buttons!![i]= button
+
+            changeButtonSize(button,50)
+            //val centerPoint = getCenterPointOfView(b1!!)
+            //Log.d(LOG_TAG, "view center point x,y (" + centerPoint!!.x + ", " + centerPoint!!.y + ")")
+            Handler(Looper.getMainLooper()).postDelayed({
+                changeButtonSize(button,150)
+
+            }, 5000)
+
+        }*/
+
+
+
     }
 
     override fun onDestroy() {
@@ -184,6 +218,146 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         when (view) {
+
+           b1 -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 1
+                        pressedButton =b1
+                        b1!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+
+
+
+
+                        Log.d(LOG_TAG, xCoord.toString())
+                        Log.d(LOG_TAG, yCoord.toString())
+                        val centerPoint = getCenterPointOfView(b1!!)
+                        Log.d(LOG_TAG, "view center point x,y (" + centerPoint!!.x + ", " + centerPoint!!.y + ")")
+                        Log.d(LOG_TAG, b1!!.width.toString())
+
+
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+            b2 -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 2
+                        pressedButton =b2
+                        pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                        val centerPoint = getCenterPointOfView(pressedButton!!)
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+
+            b3-> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 3
+                        pressedButton =b3
+                        pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                        val centerPoint = getCenterPointOfView(pressedButton!!)
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+            b4 -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 4
+                        pressedButton =b4
+                        pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                        val centerPoint = getCenterPointOfView(pressedButton!!)
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+            b5 -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 5
+                        pressedButton =b5
+                        pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                        val centerPoint = getCenterPointOfView(pressedButton!!)
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+            b6 -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 6
+                        pressedButton =b6
+                        pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                        val centerPoint = getCenterPointOfView(pressedButton!!)
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+            b7 -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 7
+                        pressedButton =b7
+                        pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                        val centerPoint = getCenterPointOfView(pressedButton!!)
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
+            b8 -> {
+                when (motionEvent.getAction()) {
+                    MotionEvent.ACTION_DOWN -> {
+                        var xCoord = motionEvent.rawX
+                        var yCoord = motionEvent.rawY
+                        lastButtonPressed = 8
+                        pressedButton =b8
+                        pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                        val centerPoint = getCenterPointOfView(pressedButton!!)
+
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.performClick()
+                    }
+                }
+            }
             oneButton -> {
                 when (motionEvent.getAction()) {
                     MotionEvent.ACTION_DOWN -> {
@@ -248,6 +422,32 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         if (requestCode == MainActivity.REQUEST_RECORD_AUDIO && grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         }
     }
+
+    private fun changeButtonSize(button:Button, size:Int){
+        button!!.layoutParams = LinearLayout.LayoutParams(size, size)
+    }
+    fun sizeChanger(size: Int){
+        for (id in buttonsIds) {
+            val button = findViewById<View>(id) as Button
+
+
+            changeButtonSize(button,size)
+
+
+        }
+    }
+
+
+
+    private fun getCenterPointOfView(view: View): Point? {
+        val location = IntArray(2)
+        view.getLocationInWindow(location)
+        val x = location[0] + view.width / 2
+        val y = location[1] + view.height / 2
+        return Point(x, y)
+    }
+
+
     @Synchronized
     fun startRecording() {
 
@@ -403,16 +603,28 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             Log.v(LOG_TAG, result.toString())
 
             if(result == "1"){
+                currentButtonToPress = buttonsOrder[counter]+1
                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                     if(currentButtonToPress == lastButtonPressed) {
                         pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
                         mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
                         lastButtonPressed = 0
-                        if(currentButtonToPress ==1){
-                            currentButtonToPress = 2
-                        }else{
-                            currentButtonToPress = 1
+                       counter += 1
+                        if (counter > 9){
+                            counter = 0
+                            counter2+=1
+                            if(counter2 > widthOrder.size){
+                                counter2 = 0
+                            }
+                            sizeChanger(widthOrder[counter2])
                         }
+                        var buttonid = buttonsOrder[counter]
+                        var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            button!!.setBackgroundColor(Color.rgb(0, 0, 255))
+
+                        }, 3000)
+
                     }
                 })
             }

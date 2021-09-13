@@ -75,77 +75,69 @@
             app:cl_direction="clockwise"
             >
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b1"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
-                />
-            <Button
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                 />
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b2"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 />
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b3"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 />
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b4"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 />
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b5"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 />
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b6"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 />
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b7"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 />
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                app:backgroundTint="#6200EE"
                 android:id="@+id/b8"
-                android:layout_width="@dimen/button_size"
-                android:layout_height="@dimen/button_size"
-
-                android:text=""
-                android:background="@drawable/circular_button"
-
+                app:cornerRadius="100dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 />
 
 
