@@ -6,9 +6,6 @@ import android.R.attr
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Point
-import android.media.AudioFormat
-import android.media.AudioRecord
-import android.media.MediaRecorder
 import android.os.*
 import android.util.Log
 import android.view.MotionEvent
@@ -39,8 +36,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import android.graphics.LightingColorFilter
 import android.graphics.PorterDuff
+import android.media.*
 import com.opencsv.CSVWriter
 import java.io.FileWriter
+
 
 
 class MainActivity : AppCompatActivity(), View.OnTouchListener {
@@ -59,17 +58,17 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var b8: Button? = null
 
     private val buttonsIds = listOf(R.id.b1,R.id.b2,R.id.b3,R.id.b4,R.id.b5,R.id.b6,R.id.b7,R.id.b8)
-    private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6)
-    private var buttons:ArrayList<Button>? = null
+    private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,2,7,3,0,4,1,5,2,6)
+    //private var buttons:ArrayList<Button>? = null
     private var counter : Int = 0
     private var counter2 : Int = 0
-    private val widthOrder = arrayOf(25,80,60)
+    private val widthOrder = arrayOf(100,80,60,25)
 
 
-    private var outputText: TextView? = null
+    private var textView: TextView? = null
     // Working variables.
     var recordingBuffer = ShortArray(MainActivity.RECORDING_LENGTH)
-    var recordingBufferClean = ShortArray(MainActivity.RECORDING_LENGTH-960)
+    //   var recordingBufferClean = ShortArray(MainActivity.RECORDING_LENGTH-960)
     var recordingOffset = 0
     var shouldContinue = true
     private var recordingThread: Thread? = null
@@ -95,33 +94,41 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
     // APP VARIABLES
-    var currentButtonToPress: Int = 7
-    var lastButtonPressed: Int = 0
+    private var currentButtonToPress: Int = 7
+    private var lastButtonPressed: Int = 0
     var pressedButton: Button? = null
-    val sizeList1: MutableList<String> = ArrayList()
-    val centerListX: MutableList<String> = ArrayList()
-    val centerListY: MutableList<String> = ArrayList()
-    val centerPointsX: MutableList<Array<String>> = ArrayList()
-    val centerPointsY: MutableList<Array<String>> = ArrayList()
-    val clicksX: MutableList<String> = ArrayList()
-    val clicksY: MutableList<String> = ArrayList()
-    val pressedButtonList: MutableList<String> = ArrayList()
-    val timeList: MutableList<String> = ArrayList()
-    var startTime: Long = 0
-
+    private val sizeList1: MutableList<String> = ArrayList()
+    private val centerListX: MutableList<String> = ArrayList()
+    private val centerListY: MutableList<String> = ArrayList()
+    private val centerPointsX: MutableList<Array<String>> = ArrayList()
+    private val centerPointsY: MutableList<Array<String>> = ArrayList()
+    private val clicksX: MutableList<String> = ArrayList()
+    private val clicksY: MutableList<String> = ArrayList()
+    private val pressedButtonList: MutableList<String> = ArrayList()
+    private val timeList: MutableList<String> = ArrayList()
+    private var startTime: Long = 0
+    private val durationInMilliSeconds: Long = 100 //Vibration Duration
+    private lateinit var soundPool: SoundPool
+    private  var sound:Int = 0
 
 
     //BUTTON CONFIG
     val PURPLE= 0
     val GREEN = 1
 
-    val buttondelay: Long= 500// in Milliseconds
+    //APP STATE
+    val MODE1 = 1
+    val MODE2 = 2
+    var STATE = 0
+
+    val buttondelay: Long= 400// in Milliseconds
 
 
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
-        val requestCode = 100
+
+        STATE = MODE1
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         startButton = findViewById<View>(R.id.start) as Button?
@@ -143,7 +150,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
         }
-
+        //BUTTON TO SEND DATA TO CSV FILE
         oneButton = findViewById<View>(R.id.one) as Button
         oneButton!!.setOnClickListener {
 
@@ -169,18 +176,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             writer.close()
 
-            /*val data: MutableList<Array<String>> = ArrayList()
-            data.add(arrayOf("India", "New Delhi"))
-            data.add(arrayOf("United States", "Washington D.C"))
-            data.add(arrayOf("Germany", "Berlin","Weekeend"))
 
-            writer.writeAll(data)
-
-            writer.close()*/
         }
+        //CONTINUE BUTTON
         twoButton = findViewById<View>(R.id.two) as Button
         twoButton!!.setOnTouchListener(this)
 
+        //APPLICATION BUTTONS
         b1 = findViewById<View>(R.id.b1) as Button
         b1!!.setOnTouchListener(this)
         b2 = findViewById<View>(R.id.b2) as Button
@@ -201,11 +203,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
 
-        outputText = findViewById<View>(R.id.output_text) as TextView?
+        textView = findViewById<View>(R.id.textView) as TextView?
+
+
+        // Request Microphone and Writing Permissions from User
         requestMicrophonePermission();
 
 
-
+       //Handler to change color back to Beginning Color
         mHandler = object : Handler() {
             override fun handleMessage(msg: Message) {
                 // TODO Auto-generated method stub
@@ -221,7 +226,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         }
 
 
-        //lOAD mODEL
+        //Load model
         tfliteOptions.setNumThreads(1)
         tfliteModel = FileUtil.loadMappedFile(this, getModelPath())
         recreateInterpreter()
@@ -240,26 +245,31 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             sizeList1.add(buttonSize.toString())
         }
 
+        //Depending on Android Version Sounds are produced differently
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            var audioAttributes:AudioAttributes = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .build()
+                 soundPool = SoundPool.Builder()
+                .setMaxStreams(2)
+                .setAudioAttributes(audioAttributes)
+                .build()
+             sound = soundPool.load(this,R.raw.sound2,1 )
+        }else
+        {
+            var soundPool = SoundPool(2, AudioManager.STREAM_MUSIC,0);
+             sound = soundPool.load(this,R.raw.sound2,1 )
+
+        }
+
+
+
         //val csv: String = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
 
 
 
 
-        //buttons = ArrayList<Button>(buttonsIds.size)
-
-  /*      for (id in buttonsIds) {
-            val button = findViewById<View>(id) as Button
-             //buttons!![i]= button
-
-            changeButtonSize(button,50)
-            //val centerPoint = getCenterPointOfView(b1!!)
-            //Log.d(LOG_TAG, "view center point x,y (" + centerPoint!!.x + ", " + centerPoint!!.y + ")")
-            Handler(Looper.getMainLooper()).postDelayed({
-                changeButtonSize(button,150)
-
-            }, 5000)
-
-        }*/
 
 
 
@@ -274,6 +284,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
     }
 
+    // Get button center points at the start of the app
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         for (id in buttonsIds) {
@@ -297,6 +308,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b1
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -328,6 +341,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b2
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -351,6 +366,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b3
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -371,6 +388,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b4
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -391,6 +410,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b5
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -411,6 +432,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b6
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -431,6 +454,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b7
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -451,6 +476,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         pressedButton =b8
                         if(currentButtonToPress == lastButtonPressed){
                             pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                            vibrator.vibrate(durationInMilliSeconds)
                             clicksX.add(xCoord.toString())
                             clicksY.add(yCoord.toString())
                             pressedButtonList.add(lastButtonPressed.toString())
@@ -519,7 +546,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private fun changeButtonSize(button:Button, size:Int){
         button!!.layoutParams = LinearLayout.LayoutParams(size, size)
     }
-    fun sizeChanger(size: Int){
+    private fun sizeChanger(size: Int){
         val cPointsX: MutableList<String> = ArrayList()
         val cPointsY: MutableList<String> = ArrayList()
         for (id in buttonsIds) {
@@ -533,7 +560,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         centerPointsY.add(cPointsY.toTypedArray())
     }
 
-    fun convertDpToPx(context: Context, dp: Float): Float {
+    private fun convertDpToPx(context: Context, dp: Float): Float {
         return dp * context.getResources().getDisplayMetrics().density
     }
 
@@ -700,6 +727,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             Log.v(LOG_TAG, result.toString())
 
+            //Behaviour of Thread depends on Mode
             if(result == "1"){
 
                 //MODE 1
@@ -707,12 +735,16 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 this@MainActivity.runOnUiThread(java.lang.Runnable {
                     if(currentButtonToPress == lastButtonPressed) {
                         val stopTime = System.currentTimeMillis()
-                        pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
+                        soundPool.play(sound, 1F, 1F,1,0, 1F)
+                        pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                        //pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
                         timeList.add((stopTime-startTime).toString())
-                        mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
+                       // mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
                         lastButtonPressed = 0
                        counter += 1
-                        if (counter > 9){
+
+                        //Loop Through Buttons and change size at the end of each test
+                        if (counter > buttonsOrder.size-1){
                             counter = 0
                             counter2+=1
                             if(counter2 > widthOrder.size-1){
@@ -726,7 +758,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                             button!!.setBackgroundColor(Color.rgb(3, 244, 252))
                             startTime = System.currentTimeMillis()
 
-                        }, 3000)
+                        }, 1)
 
                     }
                 })
@@ -763,7 +795,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
 
-            ///////PROBLEM CODE
+            ///////Code Gives Problems
             //trimming the magnitude values to 5 decimal digits
             //val df = DecimalFormat("#.#####")
             //df.roundingMode = RoundingMode.CEILING
@@ -920,12 +952,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         private const val SAMPLE_RATE = 16000
         private const val SAMPLE_DURATION_MS = 100
         private const val RECORDING_LENGTH = (SAMPLE_RATE * SAMPLE_DURATION_MS / 1000)
-        private const val MODEL_FILENAME = "file:///android_asset/q_wavenet_mobile.pb"
-        private const val INPUT_DATA_NAME = "Placeholder:0"
-        private const val OUTPUT_SCORES_NAME = "output"
 
 
-        // UI elements.
+
         private const val REQUEST_RECORD_AUDIO = 13
         private const val REQUEST_WRITE_EXTERNAL = 55
         private val LOG_TAG = "BLOWER2"
