@@ -2,7 +2,6 @@ package com. example.blower2
 
 
 import android.Manifest
-import android.R.attr
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Point
@@ -10,7 +9,6 @@ import android.os.*
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -28,18 +26,13 @@ import java.nio.ByteBuffer
 import java.nio.MappedByteBuffer
 import java.util.*
 import java.util.concurrent.locks.ReentrantLock
-import android.R.attr.button
-import android.R.attr.width
 import android.content.Context
-import android.graphics.Color.rgb
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import android.graphics.LightingColorFilter
-import android.graphics.PorterDuff
 import android.media.*
 import com.opencsv.CSVWriter
 import java.io.FileWriter
-
+import kotlin.math.log2
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 
 class MainActivity : AppCompatActivity(), View.OnTouchListener {
@@ -60,8 +53,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val buttonsIds = listOf(R.id.b1,R.id.b2,R.id.b3,R.id.b4,R.id.b5,R.id.b6,R.id.b7,R.id.b8)
     private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,2,7,3,0,4,1,5,2,6)
     //private var buttons:ArrayList<Button>? = null
-    private var counter : Int = 0
-    private var counter2 : Int = 0
+    private var counter : Int = 0 // for buttons
+    private var counter2 : Int = 0 // for changing width
+    private var endOfSection: Int = 0
     private val widthOrder = arrayOf(100,80,60,25)
 
 
@@ -106,10 +100,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val clicksY: MutableList<String> = ArrayList()
     private val pressedButtonList: MutableList<String> = ArrayList()
     private val timeList: MutableList<String> = ArrayList()
+    private val euclidianDistList: MutableList<String> = ArrayList()
+    private val iDe: MutableList<String> = ArrayList()
     private var startTime: Long = 0
     private val durationInMilliSeconds: Long = 100 //Vibration Duration
     private lateinit var soundPool: SoundPool
     private  var sound:Int = 0
+    private var stdWidths = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
 
 
     //BUTTON CONFIG
@@ -134,8 +131,11 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         startButton = findViewById<View>(R.id.start) as Button?
         startButton!!.setOnClickListener {
 
-                    startRecording()
-                    startRecognition()
+            startRecording()
+            startRecognition()
+            b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
+            startTime = System.currentTimeMillis()
+
 
 
 
@@ -155,6 +155,83 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         oneButton!!.setOnClickListener {
 
 
+            //Calculating the Euclidean distance from the center point
+            var tpCounter = 0
+            for( condition in 0 until centerPointsX.size){
+                for (event in 0 until 19){
+                    var pressedId = pressedButtonList[tpCounter].toInt()
+                    var centerX = centerPointsX[condition][pressedId-1]
+                    var centerY = centerPointsY[condition][pressedId-1]
+                    var euclideanDistance = sqrt((centerX.toFloat() - clicksX[tpCounter].toFloat()).pow(2) +(centerY.toFloat() - clicksY[tpCounter].toFloat()).pow(2))
+                    euclidianDistList.add(euclideanDistance.toString())
+                    tpCounter+=1
+                }
+            }
+            // Calculating Throughput
+            var euclideanList  = DoubleArray(euclidianDistList.size)
+            var countdist = 0
+            for (distance in euclidianDistList){
+                euclideanList[countdist]= distance.toDouble()
+                countdist += 1
+            }
+
+            Log.d(LOG_TAG, euclideanList.contentToString())
+
+            for( condition in 0 until centerPointsX.size){
+                var centerX = centerPointsX[condition][6]
+                var centerY = centerPointsY[condition][6]
+                var centerX2 = centerPointsX[condition][2]
+                var centerY2 = centerPointsY[condition][2]
+                var radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
+               // Compensante for different number of condition
+                if(condition == 0){
+                    stdWidths[condition] = calculateSD(euclideanList.slice(0..18))*4.133
+                }else if (condition ==1){
+                    stdWidths[condition] = calculateSD(euclideanList.slice(19..37))*4.133
+                } else if (condition ==2){
+                    stdWidths[condition] = calculateSD(euclideanList.slice(38..56))*4.133
+                }else if (condition ==3){
+                    stdWidths[condition] = calculateSD(euclideanList.slice(57..75))*4.133
+        }
+                iDe.add(log2(radialDist/stdWidths[condition]+1).toString())
+
+            }
+            var TP = DoubleArray(timeList.size)
+            var counterTP = 0
+            for(time in timeList){
+                if(counterTP in 0..18 ){
+                    TP[counterTP] = (iDe[0].toDouble()/timeList[counterTP].toDouble())*1000
+                }else if (counterTP in 19..37){
+                    TP[counterTP] = (iDe[1].toDouble()/timeList[counterTP].toDouble())*1000
+
+                }else if (counterTP in 38..56){
+                    TP[counterTP] = (iDe[2].toDouble()/timeList[counterTP].toDouble())*1000
+
+                }else if (counterTP in 57..75){
+                    TP[counterTP] = (iDe[3].toDouble()/timeList[counterTP].toDouble())*1000
+
+                }
+
+                counterTP += 1
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // Sending data to csv file
+            var averageTp = arrayOf(TP.average().toString())
             val csv: String = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
             Log.d(LOG_TAG, csv)
             val data: MutableList<Array<String>> = ArrayList()
@@ -169,7 +246,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             data.add(clicksX.toTypedArray())
             data.add(clicksY.toTypedArray())
             data.add(pressedButtonList.toTypedArray())
+            data.add(euclidianDistList.toTypedArray())
             data.add(timeList.toTypedArray())
+            data.add(averageTp)
             val writer = CSVWriter(FileWriter(csv + "/csv1.csv"))
             writer.writeAll(data)
             //writer.writeNext(sizeList1.toTypedArray())
@@ -180,7 +259,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         }
         //CONTINUE BUTTON
         twoButton = findViewById<View>(R.id.two) as Button
-        twoButton!!.setOnTouchListener(this)
+        twoButton!!.setOnClickListener {
+            endOfSection = 0
+            b7!!.isEnabled = true
+            twoButton!!.isEnabled = false
+            b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
+            textView!!.text = ""
+
+        }
 
         //APPLICATION BUTTONS
         b1 = findViewById<View>(R.id.b1) as Button
@@ -546,13 +632,30 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private fun changeButtonSize(button:Button, size:Int){
         button!!.layoutParams = LinearLayout.LayoutParams(size, size)
     }
+    private fun calculateSD(numArray: List<Double>): Double {
+        var sum = 0.0
+        var standardDeviation = 0.0
+
+        for (num in numArray) {
+            sum += num
+        }
+
+        val mean = sum / 10
+
+        for (num in numArray) {
+            standardDeviation += Math.pow(num - mean, 2.0)
+        }
+
+        return Math.sqrt(standardDeviation / 10)
+    }
     private fun sizeChanger(size: Int){
         val cPointsX: MutableList<String> = ArrayList()
         val cPointsY: MutableList<String> = ArrayList()
         for (id in buttonsIds) {
             val button = findViewById<View>(id) as Button
             val centerPoint = getCenterPointOfView(button!!)
-            changeButtonSize(button,size)
+            var width = convertDpToPx(this,size.toFloat())
+            changeButtonSize(button,width.toInt())
             cPointsX.add(centerPoint?.x.toString())
             cPointsY.add(centerPoint?.y.toString())
         }
@@ -725,9 +828,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             //Log.d(LOG_TAG, "Latency = ${finishTime - startTime}ms")
 
 
-            Log.v(LOG_TAG, result.toString())
+            //Log.v(LOG_TAG, result.toString())
 
             //Behaviour of Thread depends on Mode
+            // 1 indicates a blow has been detected
             if(result == "1"){
 
                 //MODE 1
@@ -746,19 +850,33 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         //Loop Through Buttons and change size at the end of each test
                         if (counter > buttonsOrder.size-1){
                             counter = 0
+                            endOfSection = 1
+                            b7!!.isEnabled = false
+                            twoButton!!.isEnabled = true
+                            textView!!.text = "Breath! When ready press continue"
                             counter2+=1
                             if(counter2 > widthOrder.size-1){
                                 counter2 = 0
+
+                                //Log.d(LOG_TAG, endOfSection.toString())
                             }
                             sizeChanger(widthOrder[counter2])
+                            Log.d(LOG_TAG, widthOrder[counter2].toString())
                         }
+                        //Change the color of the next button to press
                         var buttonid = buttonsOrder[counter]
                         var button = findViewById<View>(buttonsIds[buttonid]) as Button
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            button!!.setBackgroundColor(Color.rgb(3, 244, 252))
-                            startTime = System.currentTimeMillis()
+                        if(endOfSection == 0){
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                button!!.setBackgroundColor(Color.rgb(3, 244, 252)) //Turquoise
+                                startTime = System.currentTimeMillis()
 
-                        }, 1)
+                            }, 1)
+                        }
+                        else{
+                            button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                        }
+
 
                     }
                 })
@@ -776,7 +894,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
     fun classifyNoise ( doubleInputBuffer: DoubleArray ): String? {
 
-      // VALUES BELOW NOT GIVEN HERE BUT IN THE MFCC LIBRARY FILE
+      // VALUES BELOW NOT GIVEN HERE BUT IN THE MFCC JAVA LIBRARY FILE
        // val mNumFrames: Int
        // val mSampleRate: Int
        // val mChannels: Int
@@ -795,7 +913,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
 
-            ///////Code Gives Problems
+            /////// Commented Code Gives Problems
             //trimming the magnitude values to 5 decimal digits
             //val df = DecimalFormat("#.#####")
             //df.roundingMode = RoundingMode.CEILING
@@ -820,7 +938,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             val mfccValues =
                 Array(nMFCC) { FloatArray(nFFT) }
 
-            //loop to convert the mfcc values into multi-dimensional array
+            //Loop to convert the mfcc values into multi-dimensional array
             for (i in 0 until nFFT) {
                 var indexCounter = i * nMFCC
                 val rowIndexValue = i % nFFT
@@ -829,8 +947,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     indexCounter++
                 }
             }
-
-            //code to take the mean of mfcc values across the rows such that
+            // Input needs to be converted into the correct format accepted by Tflite
             //[nMFCC x nFFT] matrix would be converted into
             //[nMFCC xnFFT x 1] dimension - which would act as an input to tflite model
             flattenMFCCValues = FloatArray(nMFCC*nFFT)
@@ -886,7 +1003,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
         var predictedResult: String? = "unknown"
 
-        //need to transform the MFCC 1d float buffer into 1x40x1x1 dimension tensor using TensorBuffer
+        //Transform the MFCC 1d float buffer into 1x40x1x1 dimension tensor using TensorBuffer
         val inBuffer: TensorBuffer = TensorBuffer.createDynamic(imageDataType)
         if (imageShape != null) {
             inBuffer.loadArray(flatMFCCValues, imageShape!!)
