@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 } else if (condition ==2){
                     stdWidths[condition] = calculateSD(euclideanList.slice(38..56))*4.133
                 }else if (condition ==3){
-                    stdWidths[condition] = calculateSD(euclideanList.slice(57..75))*4.133
+                    stdWidths[condition] = calculateSD(euclideanList.slice(57..74))*4.133
         }
                 iDe.add(log2(radialDist/stdWidths[condition]+1).toString())
 
@@ -207,7 +207,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 }else if (counterTP in 38..56){
                     TP[counterTP] = (iDe[2].toDouble()/timeList[counterTP].toDouble())*1000
 
-                }else if (counterTP in 57..75){
+                }else if (counterTP in 57..74){
                     TP[counterTP] = (iDe[3].toDouble()/timeList[counterTP].toDouble())*1000
 
                 }
@@ -577,25 +577,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             }
 
 
-            twoButton -> {
-                when (motionEvent.getAction()) {
-                    MotionEvent.ACTION_DOWN -> {
-                        var xCoord = motionEvent.x
-                        var yCoord = motionEvent.y
-                        lastButtonPressed = 2
-                        pressedButton =twoButton
-                        pressedButton?.setBackgroundColor(Color.rgb(187, 134, 252))
-                        Log.d(LOG_TAG, xCoord.toString())
-                        Log.d(LOG_TAG, yCoord.toString())
 
-
-
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        view.performClick()
-                    }
-                }
-            }
 
 
 
