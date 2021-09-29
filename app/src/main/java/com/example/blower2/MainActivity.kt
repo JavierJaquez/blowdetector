@@ -158,13 +158,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             //Calculating the Euclidean distance from the center point
             var tpCounter = 0
             for( condition in 0 until centerPointsX.size){
-                for (event in 0 until 19){
+                for (event in buttonsOrder.indices){
                     var pressedId = pressedButtonList[tpCounter].toInt()
                     var centerX = centerPointsX[condition][pressedId-1]
                     var centerY = centerPointsY[condition][pressedId-1]
                     var euclideanDistance = sqrt((centerX.toFloat() - clicksX[tpCounter].toFloat()).pow(2) +(centerY.toFloat() - clicksY[tpCounter].toFloat()).pow(2))
                     euclidianDistList.add(euclideanDistance.toString())
-                    tpCounter+=1
+                    if(tpCounter<75) {
+                        tpCounter+=1
+                    }
                 }
             }
             // Calculating Throughput
@@ -191,7 +193,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 } else if (condition ==2){
                     stdWidths[condition] = calculateSD(euclideanList.slice(38..56))*4.133
                 }else if (condition ==3){
-                    stdWidths[condition] = calculateSD(euclideanList.slice(57..74))*4.133
+                    stdWidths[condition] = calculateSD(euclideanList.slice(57..75))*4.133
         }
                 iDe.add(log2(radialDist/stdWidths[condition]+1).toString())
 
@@ -207,7 +209,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 }else if (counterTP in 38..56){
                     TP[counterTP] = (iDe[2].toDouble()/timeList[counterTP].toDouble())*1000
 
-                }else if (counterTP in 57..74){
+                }else if (counterTP in 57..75){
                     TP[counterTP] = (iDe[3].toDouble()/timeList[counterTP].toDouble())*1000
 
                 }
@@ -261,10 +263,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         twoButton = findViewById<View>(R.id.two) as Button
         twoButton!!.setOnClickListener {
             endOfSection = 0
-            b7!!.isEnabled = true
+            //enableAllButtons()
+             b7!!.isEnabled = true
             twoButton!!.isEnabled = false
+
             b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
-            textView!!.text = ""
+            startTime = System.currentTimeMillis()
+            textView!!.text = "Click and Blow"
 
         }
 
@@ -610,7 +615,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         if (requestCode == MainActivity.REQUEST_WRITE_EXTERNAL && grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
         }
     }
+    private fun disableAllButtons(){
+        for (id in buttonsIds) {
+            val button = findViewById<View>(id) as Button
+            button!!.isEnabled = false
 
+        }
+    }
+    private fun enableAllButtons(){
+        for (id in buttonsIds) {
+            val button = findViewById<View>(id) as Button
+            button!!.isEnabled = true
+
+        }
+    }
     private fun changeButtonSize(button:Button, size:Int){
         button!!.layoutParams = LinearLayout.LayoutParams(size, size)
     }
@@ -833,16 +851,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         if (counter > buttonsOrder.size-1){
                             counter = 0
                             endOfSection = 1
-                            b7!!.isEnabled = false
-                            twoButton!!.isEnabled = true
-                            textView!!.text = "Breath! When ready press continue"
                             counter2+=1
                             if(counter2 > widthOrder.size-1){
                                 counter2 = 0
-
-                                //Log.d(LOG_TAG, endOfSection.toString())
+                            //Log.d(LOG_TAG, endOfSection.toString())
                             }
                             sizeChanger(widthOrder[counter2])
+                            b7!!.isEnabled = false
+                            twoButton!!.isEnabled = true
+                            textView!!.text = "When ready press continue"
                             Log.d(LOG_TAG, widthOrder[counter2].toString())
                         }
                         //Change the color of the next button to press
