@@ -52,6 +52,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
     private val buttonsIds = listOf(R.id.b1,R.id.b2,R.id.b3,R.id.b4,R.id.b5,R.id.b6,R.id.b7,R.id.b8)
     private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,2,7,3,0,4,1,5,2,6)
+    private val modeList1 = arrayOf(1,2,3,4)
+    private val modeList2 = arrayOf(3,4,1,2)
+    private var selectedModeList = arrayOf(0,0,0,0)
     //private var buttons:ArrayList<Button>? = null
     private var counter : Int = 0 // for buttons
     private var counter2 : Int = 0 // for changing width
@@ -114,7 +117,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     val GREEN = 1
 
     //APP STATE
-    val MODE1 = 1
+    val MODE0 = 0 //Practice Mode
+    val MODE1 = 1 // Blow and click TP
     val MODE2 = 2
     var STATE = 0
 
@@ -125,20 +129,16 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        STATE = MODE1
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        STATE = MODE1
+        startRecording()
+        startRecognition()
         startButton = findViewById<View>(R.id.start) as Button?
         startButton!!.setOnClickListener {
-
-            startRecording()
-            startRecognition()
             b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
             startTime = System.currentTimeMillis()
-
-
-
-
         }
 
         stopButton = findViewById<View>(R.id.stop) as Button?
@@ -154,6 +154,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         oneButton = findViewById<View>(R.id.one) as Button
         oneButton!!.setOnClickListener {
 
+            stopRecording()
+            stopRecognition()
 
             //Calculating the Euclidean distance from the center point
             var tpCounter = 0
@@ -257,8 +259,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             writer.close()
 
-
         }
+
         //CONTINUE BUTTON
         twoButton = findViewById<View>(R.id.two) as Button
         twoButton!!.setOnClickListener {
@@ -397,14 +399,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 1
                         pressedButton =b1
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+                        when(STATE){
+                            MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
+
 
 
 
@@ -430,14 +438,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 2
                         pressedButton =b2
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+                        when(STATE){
+                            MODE1->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
+
 
                         //val centerPoint = getCenterPointOfView(pressedButton!!)
 
@@ -455,14 +469,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 3
                         pressedButton =b3
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+                        when(STATE){
+                            MODE1->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
+
 
                     }
                     MotionEvent.ACTION_UP -> {
@@ -477,13 +497,18 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 4
                         pressedButton =b4
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+                        when(STATE){
+                            MODE1->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
 
                     }
@@ -499,13 +524,18 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 5
                         pressedButton =b5
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+                        when(STATE){
+                            MODE1->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
 
                     }
@@ -521,13 +551,19 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 6
                         pressedButton =b6
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+
+                        when(STATE){
+                            MODE1->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
 
                     }
@@ -543,13 +579,18 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 7
                         pressedButton =b7
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+                        when(STATE){
+                            MODE1->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
 
                     }
@@ -565,13 +606,18 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 8
                         pressedButton =b8
-                        if(currentButtonToPress == lastButtonPressed){
-                            pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
-                            val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                            vibrator.vibrate(durationInMilliSeconds)
-                            clicksX.add(xCoord.toString())
-                            clicksY.add(yCoord.toString())
-                            pressedButtonList.add(lastButtonPressed.toString())
+
+                        when(STATE){
+                            MODE1->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
+                                    val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    clicksX.add(xCoord.toString())
+                                    clicksY.add(yCoord.toString())
+                                    pressedButtonList.add(lastButtonPressed.toString())
+                                }
+                            }
                         }
 
                     }
@@ -834,52 +880,62 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             // 1 indicates a blow has been detected
             if(result == "1"){
 
-                //MODE 1
-                currentButtonToPress = buttonsOrder[counter]+1
-                this@MainActivity.runOnUiThread(java.lang.Runnable {
-                    if(currentButtonToPress == lastButtonPressed) {
-                        val stopTime = System.currentTimeMillis()
-                        soundPool.play(sound, 1F, 1F,1,0, 1F)
-                        pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
-                        //pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
-                        timeList.add((stopTime-startTime).toString())
-                       // mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
-                        lastButtonPressed = 0
-                       counter += 1
+                when(STATE) {
 
-                        //Loop Through Buttons and change size at the end of each test
-                        if (counter > buttonsOrder.size-1){
-                            counter = 0
-                            endOfSection = 1
-                            counter2+=1
-                            if(counter2 > widthOrder.size-1){
-                                counter2 = 0
-                            //Log.d(LOG_TAG, endOfSection.toString())
+                    MODE1 -> {
+
+                        //MODE 1
+                        currentButtonToPress = buttonsOrder[counter] + 1
+                        this@MainActivity.runOnUiThread(java.lang.Runnable {
+                            if (currentButtonToPress == lastButtonPressed) {
+                                val stopTime = System.currentTimeMillis()
+                                soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                //pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
+                                timeList.add((stopTime - startTime).toString())
+                                // mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
+                                lastButtonPressed = 0
+                                counter += 1
+
+                                //Loop Through Buttons and change size at the end of each test
+                                if (counter > buttonsOrder.size - 1) {
+                                    counter = 0
+                                    endOfSection = 1
+                                    counter2 += 1
+                                    if (counter2 > widthOrder.size - 1) {
+                                        counter2 = 0
+                                        //Log.d(LOG_TAG, endOfSection.toString())
+                                    }
+                                    sizeChanger(widthOrder[counter2])
+                                    b7!!.isEnabled = false
+                                    twoButton!!.isEnabled = true
+                                    textView!!.text = "When ready press continue"
+                                    Log.d(LOG_TAG, widthOrder[counter2].toString())
+                                }
+                                //Change the color of the next button to press
+                                var buttonid = buttonsOrder[counter]
+                                var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                if (endOfSection == 0) {
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        button!!.setBackgroundColor(
+                                            Color.rgb(
+                                                3,
+                                                244,
+                                                252
+                                            )
+                                        ) //Turquoise
+                                        startTime = System.currentTimeMillis()
+
+                                    }, 1)
+                                } else {
+                                    button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                }
+
+
                             }
-                            sizeChanger(widthOrder[counter2])
-                            b7!!.isEnabled = false
-                            twoButton!!.isEnabled = true
-                            textView!!.text = "When ready press continue"
-                            Log.d(LOG_TAG, widthOrder[counter2].toString())
-                        }
-                        //Change the color of the next button to press
-                        var buttonid = buttonsOrder[counter]
-                        var button = findViewById<View>(buttonsIds[buttonid]) as Button
-                        if(endOfSection == 0){
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                button!!.setBackgroundColor(Color.rgb(3, 244, 252)) //Turquoise
-                                startTime = System.currentTimeMillis()
-
-                            }, 1)
-                        }
-                        else{
-                            button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
-                        }
-
-
+                        })
                     }
-                })
-
+                }
 
                 //MODE 2
 

@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_margin="5dp">
 
         <io.github.francoiscampbell.circlelayout.CircleLayout
             android:layout_width="match_parent"
