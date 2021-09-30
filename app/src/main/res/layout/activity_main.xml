@@ -19,7 +19,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="When ready press Start"
+            android:text="Practice.When ready press Start"
             android:textAlignment="center"
             android:textSize="20sp" />
 
