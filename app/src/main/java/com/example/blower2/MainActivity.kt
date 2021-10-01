@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var startButton: Button? = null
     private var stopButton: Button? = null
     private var oneButton : Button? = null
-    private var twoButton : Button? = null
+    private var continueButton : Button? = null
 
     private var b1 : Button? = null
     private var b2 : Button? = null
@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var counter : Int = 0 // for buttons
     private var counter2 : Int = 0 // for changing width
     private var endOfSection: Int = 0
+    private var endOfMode: Int = 0
     private val widthOrder = arrayOf(100,80,60,25)
 
 
@@ -99,12 +100,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val sizeList1: MutableList<String> = ArrayList()
     private val centerListX: MutableList<String> = ArrayList()
     private val centerListY: MutableList<String> = ArrayList()
-    private val centerPointsX: MutableList<Array<String>> = ArrayList()
+    private val centerPointsX: MutableList<Array<String>> = ArrayList()//Mode1
     private val centerPointsY: MutableList<Array<String>> = ArrayList()
-    private val clicksX: MutableList<String> = ArrayList()
+    private val centerPointsX2: MutableList<Array<String>> = ArrayList()
+    private val centerPointsY2: MutableList<Array<String>> = ArrayList()//Mode2
+
+    private val clicksX: MutableList<String> = ArrayList() //MODE1
     private val clicksY: MutableList<String> = ArrayList()
-    private val pressedButtonList: MutableList<String> = ArrayList()
-    private val timeList: MutableList<String> = ArrayList()
+    private val clicksX2: MutableList<String> = ArrayList() //MODE2
+    private val clicksY2: MutableList<String> = ArrayList()
+
+    private val pressedButtonList: MutableList<String> = ArrayList() //Mode1
+    private val pressedButtonList2: MutableList<String> = ArrayList()
+    private val timeList: MutableList<String> = ArrayList() //MODE1
+    private val timeList2: MutableList<String> = ArrayList() //MODE2
     private val euclidianDistList: MutableList<String> = ArrayList()
     private val iDe: MutableList<String> = ArrayList()
     private var startTime: Long = 0
@@ -173,7 +182,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             //Calculating the Euclidean distance from the center point
             var tpCounter = 0
-            for( condition in 0 until centerPointsX.size-1){
+            for( condition in 0 until centerPointsX.size){
                 for (event in buttonsOrder.indices){
                     var pressedId = pressedButtonList[tpCounter].toInt()
                     var centerX = centerPointsX[condition][pressedId-1]
@@ -193,9 +202,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 countdist += 1
             }
 
-            Log.d(LOG_TAG, euclideanList.contentToString())
+            Log.d(LOG_TAG, euclideanList.size.toString())
+            Log.d(LOG_TAG, centerPointsX.size.toString())
 
-            for( condition in 0 until centerPointsX.size-1){
+            for( condition in 0 until centerPointsX.size){
                 var centerX = centerPointsX[condition][6]
                 var centerY = centerPointsY[condition][6]
                 var centerX2 = centerPointsX[condition][2]
@@ -266,19 +276,29 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         }
 
         //CONTINUE BUTTON
-        twoButton = findViewById<View>(R.id.two) as Button
-        twoButton!!.setOnClickListener {
+        continueButton = findViewById<View>(R.id.two) as Button
+        continueButton!!.setOnClickListener {
             endOfSection = 0
             //enableAllButtons()
              b7!!.isEnabled = true
-            twoButton!!.isEnabled = false
+            continueButton!!.isEnabled = false
 
-            b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
-            startTime = System.currentTimeMillis()
             when(STATE){
                 MODE1 -> textView!!.text = "Click and Blow"
                 MODE2 -> textView!!.text = "Click "
             }
+            if(endOfMode == 1 ){
+                counter = 0
+                counter2 = 0
+                currentButtonToPress = 7
+                lastButtonPressed = 0
+                sizeChanger(widthOrder[counter2])
+                endOfMode = 0
+            }
+
+            b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
+            startTime = System.currentTimeMillis()
+
 
 
         }
@@ -451,6 +471,22 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }
                             }
 
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
+                            }
+
 
                         }
 
@@ -498,6 +534,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButtonList.add(lastButtonPressed.toString())
                                 }
                             }
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
+                            }
                         }
 
 
@@ -536,6 +587,22 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButtonList.add(lastButtonPressed.toString())
                                 }
                             }
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
+                            }
+
                         }
 
 
@@ -571,6 +638,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButtonList.add(lastButtonPressed.toString())
                                 }
                             }
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
+                            }
                         }
 
                     }
@@ -604,6 +686,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     clicksY.add(yCoord.toString())
                                     pressedButtonList.add(lastButtonPressed.toString())
                                 }
+                            }
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
                             }
                         }
 
@@ -640,6 +737,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButtonList.add(lastButtonPressed.toString())
                                 }
                             }
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
+                            }
                         }
 
                     }
@@ -674,6 +786,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButtonList.add(lastButtonPressed.toString())
                                 }
                             }
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
+                            }
                         }
 
                     }
@@ -707,6 +834,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     clicksY.add(yCoord.toString())
                                     pressedButtonList.add(lastButtonPressed.toString())
                                 }
+                            }
+                            MODE2 -> {
+
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    timeList2.add((stopTime - startTime).toString())
+                                    clicksX2.add(xCoord.toString())
+                                    clicksY2.add(yCoord.toString())
+                                    lastButtonPressed = 0
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                }
+
                             }
                         }
 
@@ -800,6 +942,51 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 centerPointsX.add(cPointsX.toTypedArray())
                 centerPointsY.add(cPointsY.toTypedArray())
             }
+            MODE2 ->{
+                centerPointsX2.add(cPointsX.toTypedArray())
+                centerPointsY2.add(cPointsY.toTypedArray())
+            }
+        }
+
+    }
+    private fun buttonLoopLogic(){
+        counter += 1
+        if (counter > buttonsOrder.size - 1) {
+            counter = 0
+            endOfSection = 1
+            counter2 += 1
+            if (counter2 > widthOrder.size - 1) {
+                counter2 = 0
+                modeCounter+=1
+                endOfMode = 1
+                STATE = selectedModeList[modeCounter]
+                currentButtonToPress = 7
+                lastButtonPressed = 0
+                //Log.d(LOG_TAG, endOfSection.toString())
+            }
+            // Depends On Mode
+            sizeChanger(widthOrder[counter2])
+            b7!!.isEnabled = false
+            continueButton!!.isEnabled = true
+            textView!!.text = "When ready press continue"
+
+        }
+        //Change Next Button
+
+        var buttonid = buttonsOrder[counter]
+        var button = findViewById<View>(buttonsIds[buttonid]) as Button
+        if (endOfSection == 0) {
+            button!!.setBackgroundColor(
+                Color.rgb(
+                    3,
+                    244,
+                    252
+                )
+            ) //Turquoise
+            startTime = System.currentTimeMillis()
+
+        } else {
+            button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
         }
 
     }
@@ -1025,14 +1212,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     if (counter2 > widthOrder.size - 1) {
                                         counter2 = 0
                                         modeCounter+=1
+                                        endOfMode = 1
                                         STATE = selectedModeList[modeCounter]
                                         currentButtonToPress = 7
                                         lastButtonPressed = 0
                                         //Log.d(LOG_TAG, endOfSection.toString())
                                     }
-                                    sizeChanger(widthOrder[counter2])
+
+                                    // maybe add if not end of mode
+                                    if (endOfMode!=1){
+                                        sizeChanger(widthOrder[counter2])
+                                    }
+
                                     b7!!.isEnabled = false
-                                    twoButton!!.isEnabled = true
+                                    continueButton!!.isEnabled = true
                                     textView!!.text = "When ready press continue"
                                     Log.d(LOG_TAG, widthOrder[counter2].toString())
                                 }
