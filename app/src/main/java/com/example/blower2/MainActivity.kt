@@ -118,6 +118,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     val PURPLE= 0
     val GREEN = 1
     val TURQUOISE = 2
+    val ALL = 3
 
     //APP STATE
     val MODE0 = 0 //Practice Mode
@@ -141,13 +142,17 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         STATE = MODE0
         startRecording()
         startRecognition()
+
+        //Start Button
         startButton = findViewById<View>(R.id.start) as Button?
         startButton!!.setOnClickListener {
-            STATE = selectedModeList[0]
+            STATE = selectedModeList[modeCounter]
             currentButtonToPress = 7
             lastButtonPressed = 0
-            b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
-            startTime = System.currentTimeMillis()
+            sizeChanger(widthOrder[0])
+            startButton!!.isEnabled = false
+            mHandler?.sendEmptyMessageDelayed(ALL, 0)
+           // startTime = System.currentTimeMillis()
         }
 
         stopButton = findViewById<View>(R.id.stop) as Button?
@@ -168,7 +173,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             //Calculating the Euclidean distance from the center point
             var tpCounter = 0
-            for( condition in 0 until centerPointsX.size){
+            for( condition in 0 until centerPointsX.size-1){
                 for (event in buttonsOrder.indices){
                     var pressedId = pressedButtonList[tpCounter].toInt()
                     var centerX = centerPointsX[condition][pressedId-1]
@@ -190,7 +195,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             Log.d(LOG_TAG, euclideanList.contentToString())
 
-            for( condition in 0 until centerPointsX.size){
+            for( condition in 0 until centerPointsX.size-1){
                 var centerX = centerPointsX[condition][6]
                 var centerY = centerPointsY[condition][6]
                 var centerX2 = centerPointsX[condition][2]
@@ -270,7 +275,11 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
             startTime = System.currentTimeMillis()
-            textView!!.text = "Click and Blow"
+            when(STATE){
+                MODE1 -> textView!!.text = "Click and Blow"
+                MODE2 -> textView!!.text = "Click "
+            }
+
 
         }
 
@@ -313,6 +322,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         //mHandler?.sendEmptyMessageDelayed(YELLOW, buttondelay)
                     }
                     TURQUOISE ->{
+                        b7!!.setBackgroundColor(
+                            Color.rgb(
+                                3,
+                                244,
+                                252
+                            ))
+                        startTime = System.currentTimeMillis()
+
+                    }
+                    ALL -> {
+                        for (id in buttonsIds) {
+                            val button = findViewById<View>(id) as Button
+                            button.setBackgroundColor(Color.rgb(98, 0, 238))
+                        }
+                        mHandler?.sendEmptyMessageDelayed(TURQUOISE, 100)
 
                     }
 
@@ -376,9 +400,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
     }
 
-    // Get button center points at the start of the app
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
+    override fun onStart() {
+        super.onStart()
         for (id in buttonsIds) {
             val button = findViewById<View>(id) as Button
             //val buttonSize = convertDpToPx(this,25.0.toFloat())
@@ -392,6 +415,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 244,
                 252
             ))
+    }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+
     }
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
@@ -768,8 +795,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             cPointsX.add(centerPoint?.x.toString())
             cPointsY.add(centerPoint?.y.toString())
         }
-        centerPointsX.add(cPointsX.toTypedArray())
-        centerPointsY.add(cPointsY.toTypedArray())
+        when(STATE){
+            MODE1 ->{
+                centerPointsX.add(cPointsX.toTypedArray())
+                centerPointsY.add(cPointsY.toTypedArray())
+            }
+        }
+
     }
 
     private fun convertDpToPx(context: Context, dp: Float): Float {
@@ -972,7 +1004,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
                     MODE1 -> {
 
-                        //MODE 1
+                        //MODE 1 BLOW AND CLICK
                         currentButtonToPress = buttonsOrder[counter] + 1 // +1 to reflect buttons real value
                         this@MainActivity.runOnUiThread(java.lang.Runnable {
                             if (currentButtonToPress == lastButtonPressed) {
@@ -992,6 +1024,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     counter2 += 1
                                     if (counter2 > widthOrder.size - 1) {
                                         counter2 = 0
+                                        modeCounter+=1
+                                        STATE = selectedModeList[modeCounter]
+                                        currentButtonToPress = 7
+                                        lastButtonPressed = 0
                                         //Log.d(LOG_TAG, endOfSection.toString())
                                     }
                                     sizeChanger(widthOrder[counter2])
@@ -1023,11 +1059,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                             }
                         })
                     }
+                    //MODE 2
+                    MODE2 -> {
+
+                    }
+
+
                 }
-
-                //MODE 2
-
-
 
 
 
