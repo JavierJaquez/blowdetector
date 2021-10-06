@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
     private var textView: TextView? = null
+    private var modeTextView: TextView? = null
     // Working variables.
     var recordingBuffer = ShortArray(MainActivity.RECORDING_LENGTH)
     //   var recordingBufferClean = ShortArray(MainActivity.RECORDING_LENGTH-960)
@@ -97,6 +98,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var currentButtonToPress: Int = 7
     private var lastButtonPressed: Int = 0
     var pressedButton: Button? = null
+    var waitForConfirmation:Int = 0
     private val sizeList1: MutableList<String> = ArrayList()
     private val centerListX: MutableList<String> = ArrayList()
     private val centerListY: MutableList<String> = ArrayList()
@@ -104,11 +106,17 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val centerPointsY: MutableList<Array<String>> = ArrayList()
     private val centerPointsX2: MutableList<Array<String>> = ArrayList()
     private val centerPointsY2: MutableList<Array<String>> = ArrayList()//Mode2
+    private val centerPointsX3: MutableList<String> = ArrayList()
+    private val centerPointsY3: MutableList<String> = ArrayList()//Mode1
+    private val centerPointsX4: MutableList<String> = ArrayList()
+    private val centerPointsY4: MutableList<String> = ArrayList()//Mode2
 
     private val clicksX: MutableList<String> = ArrayList() //MODE1
     private val clicksY: MutableList<String> = ArrayList()
     private val clicksX2: MutableList<String> = ArrayList() //MODE2
     private val clicksY2: MutableList<String> = ArrayList()
+    private val centerDistList: MutableList<String> = ArrayList()//Mode1
+    private val centerDistList2: MutableList<String> = ArrayList()//Mode2
 
     private val pressedButtonList: MutableList<String> = ArrayList() //Mode1
     private val pressedButtonList2: MutableList<String> = ArrayList()
@@ -116,11 +124,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val timeList2: MutableList<String> = ArrayList() //MODE2
     private val euclidianDistList: MutableList<String> = ArrayList()
     private val iDe: MutableList<String> = ArrayList()
+    private val iDe2: MutableList<String> = ArrayList()
     private var startTime: Long = 0
     private val durationInMilliSeconds: Long = 100 //Vibration Duration
     private lateinit var soundPool: SoundPool
     private  var sound:Int = 0
     private var stdWidths = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
+    private var stdWidths2 = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
 
 
     //BUTTON CONFIG
@@ -162,6 +172,11 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             startButton!!.isEnabled = false
             mHandler?.sendEmptyMessageDelayed(ALL, 0)
            // startTime = System.currentTimeMillis()
+            when(STATE){
+                1 -> {modeTextView!!.text = "Mode Click and Blow"}
+                2 -> {modeTextView!!.text = "Mode Only Click"}
+
+            }
         }
 
         stopButton = findViewById<View>(R.id.stop) as Button?
@@ -195,33 +210,91 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 }
             }
             // Calculating Throughput
-            var euclideanList  = DoubleArray(euclidianDistList.size)
+                //Mode1
+             var euclideanList  = DoubleArray(centerDistList.size)
             var countdist = 0
-            for (distance in euclidianDistList){
+            for (distance in centerDistList){
                 euclideanList[countdist]= distance.toDouble()
                 countdist += 1
             }
+            //Mode 2
+            var euclideanList2  = DoubleArray(centerDistList2.size)
+            var countdist2 = 0
+            for (distance in centerDistList2){
+                euclideanList2[countdist2]= distance.toDouble()
+                countdist2 += 1
+            }
 
-            Log.d(LOG_TAG, euclideanList.size.toString())
-            Log.d(LOG_TAG, centerPointsX.size.toString())
+            //Log.d(LOG_TAG, euclideanList.size.toString())
+            //Log.d(LOG_TAG, centerPointsX.size.toString())
 
-            for( condition in 0 until centerPointsX.size){
-                var centerX = centerPointsX[condition][6]
-                var centerY = centerPointsY[condition][6]
-                var centerX2 = centerPointsX[condition][2]
-                var centerY2 = centerPointsY[condition][2]
-                var radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-               // Compensante for different number of condition
+            for( condition in 0 until widthOrder.size){
+                var radialDist = 0.0F
+                var radialDist2 = 0.0F
+               // Compensate for different number of condition
                 if(condition == 0){
+                    //Mode1
+                    var centerX = centerPointsX3[0]
+                    var centerY = centerPointsY3[0]
+                    var centerX2 = centerPointsX3[1]
+                    var centerY2 = centerPointsY3[1]
+                     radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
                     stdWidths[condition] = calculateSD(euclideanList.slice(0..18))*4.133
+                    //Mode2
+                    centerX = centerPointsX4[0]
+                    centerY = centerPointsY4[0]
+                    centerX2 = centerPointsX4[1]
+                    centerY2 = centerPointsY4[1]
+                    radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(0..18))*4.133
                 }else if (condition ==1){
+                    var centerX = centerPointsX3[19]
+                    var centerY = centerPointsY3[19]
+                    var centerX2 = centerPointsX3[20]
+                    var centerY2 = centerPointsY3[20]
+                    radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
                     stdWidths[condition] = calculateSD(euclideanList.slice(19..37))*4.133
+                    //Mode2
+                    centerX = centerPointsX4[19]
+                    centerY = centerPointsY4[19]
+                    centerX2 = centerPointsX4[20]
+                    centerY2 = centerPointsY4[20]
+                    radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(19..37))*4.133
                 } else if (condition ==2){
+                    var centerX = centerPointsX3[38]
+                    var centerY = centerPointsY3[38]
+                    var centerX2 = centerPointsX3[39]
+                    var centerY2 = centerPointsY3[39]
+                    radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
                     stdWidths[condition] = calculateSD(euclideanList.slice(38..56))*4.133
+                    //Mode2
+                    centerX = centerPointsX4[38]
+                    centerY = centerPointsY4[38]
+                    centerX2 = centerPointsX4[39]
+                    centerY2 = centerPointsY4[39]
+                    radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(38..56))*4.133
                 }else if (condition ==3){
-                    stdWidths[condition] = calculateSD(euclideanList.slice(57..75))*4.133
+                    var centerX = centerPointsX3[57]
+                    var centerY = centerPointsY3[57]
+                    var centerX2 = centerPointsX3[58]
+                    var centerY2 = centerPointsY3[58]
+                    radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
+                    stdWidths[condition] = calculateSD(euclideanList.slice(57 until euclideanList.size))*4.133
+                    //Mode2
+                    centerX = centerPointsX4[57]
+                    centerY = centerPointsY4[57]
+                    centerX2 = centerPointsX4[58]
+                    centerY2 = centerPointsY4[58]
+                    radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(57 until euclideanList.size))*4.133
         }
-                iDe.add(log2(radialDist/stdWidths[condition]+1).toString())
+                if(condition <= stdWidths.size -1){
+                    iDe.add(log2(radialDist/stdWidths[condition]+1).toString())
+                    iDe2.add(log2(radialDist2/stdWidths2[condition]+1).toString())
+                }
+
 
             }
             var TP = DoubleArray(timeList.size)
@@ -235,7 +308,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 }else if (counterTP in 38..56){
                     TP[counterTP] = (iDe[2].toDouble()/timeList[counterTP].toDouble())*1000
 
-                }else if (counterTP in 57..75){
+                }else if (counterTP in 57 until timeList.size){
                     TP[counterTP] = (iDe[3].toDouble()/timeList[counterTP].toDouble())*1000
 
                 }
@@ -245,11 +318,34 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
             }
+            //Mode2
+            var TP2 = DoubleArray(timeList2.size)
+            var counterTP2 = 0
+            for(time in timeList2){
+                if(counterTP2 in 0..18 ){
+                    TP2[counterTP2] = (iDe2[0].toDouble()/timeList2[counterTP2].toDouble())*1000
+                }else if (counterTP2 in 19..37){
+                    TP2[counterTP2] = (iDe2[1].toDouble()/timeList2[counterTP2].toDouble())*1000
+
+                }else if (counterTP2 in 38..56){
+                    TP2[counterTP2] = (iDe2[2].toDouble()/timeList2[counterTP2].toDouble())*1000
+
+                }else if (counterTP2 in 57 until timeList2.size){
+                    TP2[counterTP2] = (iDe2[3].toDouble()/timeList2[counterTP2].toDouble())*1000
+
+                }
+
+                counterTP2 += 1
+
+
+
+            }
 
 
 
             // Sending data to csv file
             var averageTp = arrayOf(TP.average().toString())
+            var averageTp2 = arrayOf(TP2.average().toString())
             val csv: String = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
             Log.d(LOG_TAG, csv)
             val data: MutableList<Array<String>> = ArrayList()
@@ -266,7 +362,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             data.add(pressedButtonList.toTypedArray())
             data.add(euclidianDistList.toTypedArray())
             data.add(timeList.toTypedArray())
+            data.add(centerDistList.toTypedArray())
+            data.add(centerPointsX3.toTypedArray())
+            data.add(centerPointsY3.toTypedArray())
             data.add(averageTp)
+
+            //Mode2
+            data.add(clicksX2.toTypedArray())
+            data.add(clicksY2.toTypedArray())
+            data.add(pressedButtonList2.toTypedArray())
+            data.add(timeList2.toTypedArray())
+            data.add(centerDistList2.toTypedArray())
+            data.add(centerPointsX4.toTypedArray())
+            data.add(centerPointsY4.toTypedArray())
+            data.add(averageTp2)
             val writer = CSVWriter(FileWriter(csv + "/csv1.csv"))
             writer.writeAll(data)
             //writer.writeNext(sizeList1.toTypedArray())
@@ -284,8 +393,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             continueButton!!.isEnabled = false
 
             when(STATE){
-                MODE1 -> textView!!.text = "Click and Blow"
-                MODE2 -> textView!!.text = "Click "
+                MODE1 -> {
+                    textView!!.text = "Click and Blow"
+                    modeTextView!!.text = "Mode Click and Blow"
+                }
+                MODE2 -> {
+                    textView!!.text = "Click "
+                    modeTextView!!.text = "Mode Only Click"
+                }
             }
             if(endOfMode == 1 ){
                 counter = 0
@@ -325,6 +440,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
         textView = findViewById<View>(R.id.textView) as TextView?
+        modeTextView = findViewById<View>(R.id.modeTextView) as TextView?
 
 
         // Request Microphone and Writing Permissions from User
@@ -451,6 +567,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 1
                         pressedButton =b1
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
                         when(STATE){
                             MODE0->{
@@ -464,15 +582,23 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
+
                                 }
                             }
 
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -480,9 +606,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -515,6 +646,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 2
                         pressedButton =b2
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
                         when(STATE){
                             MODE0->{
@@ -528,14 +661,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
                                 }
                             }
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -543,9 +683,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -568,6 +713,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 3
                         pressedButton =b3
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
                         when(STATE){
                             MODE0->{
@@ -581,14 +728,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
                                 }
                             }
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -596,9 +749,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -619,6 +777,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 4
                         pressedButton =b4
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
                         when(STATE){
                             MODE0->{
@@ -632,14 +792,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
                                 }
                             }
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -647,9 +813,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -668,6 +839,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 5
                         pressedButton =b5
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
                         when(STATE){
                             MODE0->{
@@ -681,14 +854,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
                                 }
                             }
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -696,9 +875,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -717,6 +901,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 6
                         pressedButton =b6
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
 
                         when(STATE){
@@ -731,14 +917,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
                                 }
                             }
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -746,9 +938,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -767,6 +964,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 7
                         pressedButton =b7
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
                         when(STATE){
                             MODE0->{
@@ -780,14 +979,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
                                 }
                             }
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -795,9 +1000,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -816,6 +1026,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         var yCoord = motionEvent.rawY
                         lastButtonPressed = 8
                         pressedButton =b8
+                        var centerButtonPoints = getCenterPointOfView(pressedButton!!)
+                        var centerDistance = sqrt((centerButtonPoints!!.x - xCoord).pow(2) +(centerButtonPoints!!.y - yCoord).pow(2))
 
                         when(STATE){
                             MODE0->{
@@ -829,14 +1041,20 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    vibrator.vibrate(durationInMilliSeconds)
-                                    clicksX.add(xCoord.toString())
-                                    clicksY.add(yCoord.toString())
-                                    pressedButtonList.add(lastButtonPressed.toString())
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1
+                                        vibrator.vibrate(durationInMilliSeconds)
+                                        clicksX.add(xCoord.toString())
+                                        clicksY.add(yCoord.toString())
+                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
+                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
+                                        centerDistList.add(centerDistance.toString())
+                                        pressedButtonList.add(lastButtonPressed.toString())
+                                    }
                                 }
                             }
                             MODE2 -> {
-
+                                currentButtonToPress = buttonsOrder[counter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
@@ -844,9 +1062,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
-                                    lastButtonPressed = 0
+                                    centerPointsX4.add(centerButtonPoints!!.x.toString())
+                                    centerPointsY4.add(centerButtonPoints!!.y.toString())
+                                    centerDistList2.add(centerDistance.toString())
+
                                     //Button Loop Logic
                                     buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
                             }
@@ -931,12 +1154,18 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         val cPointsY: MutableList<String> = ArrayList()
         for (id in buttonsIds) {
             val button = findViewById<View>(id) as Button
-            val centerPoint = getCenterPointOfView(button!!)
             var width = convertDpToPx(this,size.toFloat())
-            changeButtonSize(button,width.toInt())
+            changeButtonSize(button,width.toInt())}
+
+        for (id in buttonsIds) {
+            val button = findViewById<View>(id) as Button
+            val centerPoint = getCenterPointOfView(button!!)
             cPointsX.add(centerPoint?.x.toString())
             cPointsY.add(centerPoint?.y.toString())
         }
+
+
+
         when(STATE){
             MODE1 ->{
                 centerPointsX.add(cPointsX.toTypedArray())
@@ -965,7 +1194,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 //Log.d(LOG_TAG, endOfSection.toString())
             }
             // Depends On Mode
+            if (endOfMode!=1){
             sizeChanger(widthOrder[counter2])
+            }
             b7!!.isEnabled = false
             continueButton!!.isEnabled = true
             textView!!.text = "When ready press continue"
@@ -1196,6 +1427,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         this@MainActivity.runOnUiThread(java.lang.Runnable {
                             if (currentButtonToPress == lastButtonPressed) {
                                 val stopTime = System.currentTimeMillis()
+
                                 soundPool.play(sound, 1F, 1F, 1, 0, 1F)
                                 pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
                                 //pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
@@ -1203,6 +1435,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 // mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
                                 lastButtonPressed = 0
                                 counter += 1
+                                waitForConfirmation =0
 
                                 //Loop Through Buttons and change size at the end of each test
                                 if (counter > buttonsOrder.size - 1) {
@@ -1218,6 +1451,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                         lastButtonPressed = 0
                                         //Log.d(LOG_TAG, endOfSection.toString())
                                     }
+
+                                    currentButtonToPress = buttonsOrder[counter] + 1
 
                                     // maybe add if not end of mode
                                     if (endOfMode!=1){
