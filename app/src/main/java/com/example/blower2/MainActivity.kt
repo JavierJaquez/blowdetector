@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,2,7,3,0,4,1,5,2,6)
     private val modeList1 = arrayOf(1,2,3,4)
     private val modeList2 = arrayOf(2,1,4,3)
+    private val testMode1 = arrayOf(3,4,1,2)
+    private val testMode2 = arrayOf(4,3,1,2)
     private var selectedModeList = arrayOf(0,0,0,0)
     //private var buttons:ArrayList<Button>? = null
     private var modeCounter: Int = 0
@@ -99,6 +101,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var lastButtonPressed: Int = 0
     var pressedButton: Button? = null
     var waitForConfirmation:Int = 0
+    var waitForNextBlow:Int = 0
+    var endOfTest:Int = 0
     private val sizeList1: MutableList<String> = ArrayList()
     private val centerListX: MutableList<String> = ArrayList()
     private val centerListY: MutableList<String> = ArrayList()
@@ -117,6 +121,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val clicksY2: MutableList<String> = ArrayList()
     private val centerDistList: MutableList<String> = ArrayList()//Mode1
     private val centerDistList2: MutableList<String> = ArrayList()//Mode2
+    private val reactionTime1: MutableList<String> = ArrayList()//Mode1
+    private val reactionTime2: MutableList<String> = ArrayList()//Mode2
 
     private val pressedButtonList: MutableList<String> = ArrayList() //Mode1
     private val pressedButtonList2: MutableList<String> = ArrayList()
@@ -143,6 +149,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     val MODE0 = 0 //Practice Mode
     val MODE1 = 1 // Blow and click TP
     val MODE2 = 2
+    val MODE3 = 3
+    val MODE4 = 4
     var STATE = 0
 
     val buttondelay: Long= 400// in Milliseconds
@@ -156,7 +164,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //This needs to be replace with selector using user Id
-        selectedModeList = modeList1
+        selectedModeList = testMode1
         //////////////////////////////////
         STATE = MODE0
         startRecording()
@@ -175,6 +183,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             when(STATE){
                 1 -> {modeTextView!!.text = "Mode Click and Blow"}
                 2 -> {modeTextView!!.text = "Mode Only Click"}
+                3 -> {modeTextView!!.text = "Reaction Only Blow"}
+                4-> {modeTextView!!.text = "Reaction Only Click"}
 
             }
         }
@@ -388,6 +398,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         continueButton = findViewById<View>(R.id.two) as Button
         continueButton!!.setOnClickListener {
             endOfSection = 0
+            waitForNextBlow = 0
             //enableAllButtons()
              b7!!.isEnabled = true
             continueButton!!.isEnabled = false
@@ -400,6 +411,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 MODE2 -> {
                     textView!!.text = "Click "
                     modeTextView!!.text = "Mode Only Click"
+                }
+                MODE3 -> {
+                    textView!!.text = "Blow "
+                    modeTextView!!.text = "Reaction Only Blow"
+                }
+                MODE4 -> {
+                    textView!!.text = "Click "
+                    modeTextView!!.text = "Reaction Only Click"
                 }
             }
             if(endOfMode == 1 ){
@@ -617,6 +636,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }
 
                             }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
+                            }
 
 
                         }
@@ -694,6 +747,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }
 
                             }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
+                            }
                         }
 
 
@@ -760,6 +847,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }
 
                             }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
+                            }
 
                         }
 
@@ -824,6 +945,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }
 
                             }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
+                            }
                         }
 
                     }
@@ -885,6 +1040,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
+                            }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
                             }
                         }
 
@@ -949,6 +1138,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }
 
                             }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
+                            }
                         }
 
                     }
@@ -1011,6 +1234,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }
 
                             }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
+                            }
                         }
 
                     }
@@ -1072,6 +1329,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     currentButtonToPress = buttonsOrder[counter] + 1
                                 }
 
+                            }
+                            MODE3->{}
+                            MODE4 ->{
+                                currentButtonToPress = buttonsOrder[counter] + 1
+                                if (currentButtonToPress == lastButtonPressed) {
+                                    val stopTime = System.currentTimeMillis()
+                                    soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    reactionTime2.add((stopTime - startTime).toString())
+                                    //Button Loop Logic
+                                    buttonLoopLogic()
+                                    lastButtonPressed = 0
+                                    currentButtonToPress = buttonsOrder[counter] + 1
+                                    //Change the color of the next button to press
+                                    var buttonid = buttonsOrder[counter]
+                                    var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                    if (endOfSection == 0) {
+                                        Handler(Looper.getMainLooper()).postDelayed(
+                                            {
+                                                Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                                button!!.setBackgroundColor(
+                                                    Color.rgb(
+                                                        3,
+                                                        244,
+                                                        252
+                                                    )
+                                                ) //Turquoise
+                                                startTime = System.currentTimeMillis()
+
+                                            }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                    } else {
+                                        button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    }
+                                }
                             }
                         }
 
@@ -1186,7 +1477,17 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             counter2 += 1
             if (counter2 > widthOrder.size - 1) {
                 counter2 = 0
-                modeCounter+=1
+                if(modeCounter>= selectedModeList.size-1){
+                    endOfTest = 1
+
+                    textView!!.text = "Press to save Data"
+                    modeTextView!!.text = "End Of Experiment"
+
+
+                }else{
+                    modeCounter+=1
+                }
+
                 endOfMode = 1
                 STATE = selectedModeList[modeCounter]
                 currentButtonToPress = 7
@@ -1198,26 +1499,31 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             sizeChanger(widthOrder[counter2])
             }
             b7!!.isEnabled = false
-            continueButton!!.isEnabled = true
-            textView!!.text = "When ready press continue"
+            if(endOfTest!= 1){
+                continueButton!!.isEnabled = true
+                textView!!.text = "When ready press continue"
+            }
+
 
         }
         //Change Next Button
 
-        var buttonid = buttonsOrder[counter]
-        var button = findViewById<View>(buttonsIds[buttonid]) as Button
-        if (endOfSection == 0) {
-            button!!.setBackgroundColor(
-                Color.rgb(
-                    3,
-                    244,
-                    252
-                )
-            ) //Turquoise
-            startTime = System.currentTimeMillis()
+        if(STATE != MODE3 && STATE!= MODE4) {
+            var buttonid = buttonsOrder[counter]
+            var button = findViewById<View>(buttonsIds[buttonid]) as Button
+            if (endOfSection == 0) {
+                button!!.setBackgroundColor(
+                    Color.rgb(
+                        3,
+                        244,
+                        252
+                    )
+                ) //Turquoise
+                startTime = System.currentTimeMillis()
 
-        } else {
-            button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+            } else {
+                button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+            }
         }
 
     }
@@ -1454,7 +1760,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
                                     currentButtonToPress = buttonsOrder[counter] + 1
 
-                                    // maybe add if not end of mode
+
                                     if (endOfMode!=1){
                                         sizeChanger(widthOrder[counter2])
                                     }
@@ -1489,6 +1795,50 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     //MODE 2
                     MODE2 -> {
+
+                    }
+
+                    MODE3 ->{
+                        if(waitForNextBlow == 0) {
+                            waitForNextBlow =1
+
+
+                            this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                val stopTime = System.currentTimeMillis()
+                                var blowButtonid = buttonsOrder[counter]
+                                var blowButton = findViewById<View>(buttonsIds[blowButtonid ]) as Button
+                                soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                blowButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+
+                                reactionTime1.add((stopTime - startTime).toString())
+                                buttonLoopLogic()
+                                //Change the color of the next button to press
+                                var buttonid = buttonsOrder[counter]
+                                var button = findViewById<View>(buttonsIds[buttonid]) as Button
+                                if (endOfSection == 0) {
+                                    Handler(Looper.getMainLooper()).postDelayed(
+                                        {
+                                            waitForNextBlow = 0
+                                            Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                            button!!.setBackgroundColor(
+                                                Color.rgb(
+                                                    3,
+                                                    244,
+                                                    252
+                                                )
+                                            ) //Turquoise
+                                            startTime = System.currentTimeMillis()
+
+                                        }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                } else {
+                                    button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                }
+                            })
+
+
+                        }
+                    }
+                    MODE4 -> {
 
                     }
 
