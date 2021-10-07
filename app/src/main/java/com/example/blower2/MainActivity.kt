@@ -37,7 +37,7 @@ import kotlin.math.sqrt
 
 class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var startButton: Button? = null
-    private var stopButton: Button? = null
+   // private var stopButton: Button? = null
     private var oneButton : Button? = null
     private var continueButton : Button? = null
 
@@ -166,6 +166,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         //This needs to be replace with selector using user Id
         selectedModeList = testMode1
         //////////////////////////////////
+
         STATE = MODE0
         startRecording()
         startRecognition()
@@ -189,7 +190,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             }
         }
 
-        stopButton = findViewById<View>(R.id.stop) as Button?
+      //  stopButton = findViewById<View>(R.id.stop) as Button?
+        /*
         stopButton!!.setOnClickListener {
 
             stopRecording()
@@ -197,9 +199,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
 
-        }
+        } */
         //BUTTON TO SEND DATA TO CSV FILE
         oneButton = findViewById<View>(R.id.one) as Button
+        oneButton!!.isEnabled = false
         oneButton!!.setOnClickListener {
 
             stopRecording()
@@ -351,7 +354,16 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             }
 
-
+            var reactionTime1Float = FloatArray(reactionTime1.size)
+            var reactionTime2Float = FloatArray(reactionTime2.size)
+            for(time in reactionTime1Float.indices){
+                reactionTime1Float[time] = reactionTime1[time].toFloat()
+            }
+            for(time in reactionTime2Float.indices){
+                reactionTime2Float[time] = reactionTime2[time].toFloat()
+            }
+            var averageReactionTime1 = reactionTime1Float.average()
+            var averageReactionTime2 = reactionTime2Float.average()
 
             // Sending data to csv file
             var averageTp = arrayOf(TP.average().toString())
@@ -360,13 +372,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             Log.d(LOG_TAG, csv)
             val data: MutableList<Array<String>> = ArrayList()
             data.add(sizeList1.toTypedArray())
-            data.add(centerListX.toTypedArray())
-            data.add(centerListY.toTypedArray())
-            for(i in 0 until centerPointsX.size ){
+           // data.add(centerListX.toTypedArray())
+           // data.add(centerListY.toTypedArray())
+          /*  for(i in 0 until centerPointsX.size ){
                 data.add(centerPointsX[i])
                 data.add(centerPointsY[i])
 
-            }
+            } */
             data.add(clicksX.toTypedArray())
             data.add(clicksY.toTypedArray())
             data.add(pressedButtonList.toTypedArray())
@@ -380,17 +392,27 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             //Mode2
             data.add(clicksX2.toTypedArray())
             data.add(clicksY2.toTypedArray())
-            data.add(pressedButtonList2.toTypedArray())
+           // data.add(pressedButtonList2.toTypedArray())
             data.add(timeList2.toTypedArray())
             data.add(centerDistList2.toTypedArray())
             data.add(centerPointsX4.toTypedArray())
             data.add(centerPointsY4.toTypedArray())
             data.add(averageTp2)
+
+            //Mode 3
+            data.add(reactionTime1.toTypedArray())
+            data.add(arrayOf((averageReactionTime1/1000).toString()))
+
+            data.add(reactionTime2.toTypedArray())
+            data.add(arrayOf((averageReactionTime2/1000).toString()))
+
             val writer = CSVWriter(FileWriter(csv + "/csv1.csv"))
             writer.writeAll(data)
             //writer.writeNext(sizeList1.toTypedArray())
 
             writer.close()
+            modeTextView!!.text ="Data Saved"
+            textView!!.text = "Check Downloads"
 
         }
 
@@ -1479,7 +1501,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 counter2 = 0
                 if(modeCounter>= selectedModeList.size-1){
                     endOfTest = 1
-
+                    oneButton!!.isEnabled = true
                     textView!!.text = "Press to save Data"
                     modeTextView!!.text = "End Of Experiment"
 
