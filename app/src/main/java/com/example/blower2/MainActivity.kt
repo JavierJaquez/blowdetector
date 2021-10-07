@@ -28,15 +28,21 @@ import java.util.*
 import java.util.concurrent.locks.ReentrantLock
 import android.content.Context
 import android.media.*
+import android.view.inputmethod.InputMethodManager
 import com.opencsv.CSVWriter
 import java.io.FileWriter
 import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.math.sqrt
+import android.widget.EditText
+
+
+
 
 
 class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var startButton: Button? = null
+    private var idButton: Button? = null
    // private var stopButton: Button? = null
     private var oneButton : Button? = null
     private var continueButton : Button? = null
@@ -164,12 +170,40 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //This needs to be replace with selector using user Id
-        selectedModeList = testMode1
+        //selectedModeList = testMode1
         //////////////////////////////////
 
         STATE = MODE0
         startRecording()
         startRecognition()
+        val idText = findViewById<View>(R.id.editText) as EditText
+
+        //Id Button
+        idButton = findViewById<View>(R.id.buttonId) as Button?
+        idButton!!.setOnClickListener {
+            var strValue = idText.text.toString()
+            if(strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "1"  ){
+                selectedModeList = modeList1
+                modeTextView!!.text = "Mode 1 selected"
+                startButton!!.isEnabled = true
+            } else if (strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "2" ){
+                selectedModeList = modeList2
+                startButton!!.isEnabled = true
+                modeTextView!!.text = "Mode 2 selected"
+            }else{
+                    modeTextView!!.text = "Invalid Input"
+            }
+
+
+            Log.d("LOG_TAG",strValue[strValue.length-1].toString())
+            Log.d("LOG_TAG",strValue[strValue.length-2].toString())
+            (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).apply {
+                hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+            }
+            idText.clearFocus()
+
+        }
+
 
         //Start Button
         startButton = findViewById<View>(R.id.start) as Button?
@@ -406,7 +440,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             data.add(reactionTime2.toTypedArray())
             data.add(arrayOf((averageReactionTime2/1000).toString()))
 
-            val writer = CSVWriter(FileWriter(csv + "/csv1.csv"))
+            var fileName = idText.text.toString()
+
+            val writer = CSVWriter(FileWriter(csv + "/"+fileName+".csv"))
             writer.writeAll(data)
             //writer.writeNext(sizeList1.toTypedArray())
 
