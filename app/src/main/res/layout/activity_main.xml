@@ -89,7 +89,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <io.github.francoiscampbell.circlelayout.CircleLayout
             android:layout_width="match_parent"
@@ -181,7 +181,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
 
         <Button

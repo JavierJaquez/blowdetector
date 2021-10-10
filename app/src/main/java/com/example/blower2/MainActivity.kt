@@ -46,6 +46,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
    // private var stopButton: Button? = null
     private var oneButton : Button? = null
     private var continueButton : Button? = null
+    private var continueButton2 : Button? = null
+    private var secondTaskButton : Button? = null
 
     private var b1 : Button? = null
     private var b2 : Button? = null
@@ -68,6 +70,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var practiceCounter : Int = 0
     private var counter : Int = 0 // for buttons
     private var counter2 : Int = 0 // for changing width
+    private var secondTaskCounter : Int = 0 //
+    private val secondTaskLength : Int = 20 //
     private var endOfSection: Int = 0
     private var endOfMode: Int = 0
     private val widthOrder = arrayOf(100,80,60,25)
@@ -108,6 +112,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     var pressedButton: Button? = null
     var waitForConfirmation:Int = 0
     var waitForNextBlow:Int = 0
+    var waitForNextClick: Int = 0
     var endOfTest:Int = 0
     private val sizeList1: MutableList<String> = ArrayList()
     private val centerListX: MutableList<String> = ArrayList()
@@ -192,7 +197,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 selectedModeList = modeList2
                 startButton!!.isEnabled = true
                 modeTextView!!.text = "Mode 2 selected"
-            }else{
+            }else if (strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "3" ){
+                selectedModeList = testMode1
+                startButton!!.isEnabled = true
+                modeTextView!!.text = "Test Mode 1 "}
+                else if (strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "4" ){
+                selectedModeList = testMode2
+                startButton!!.isEnabled = true
+                modeTextView!!.text = "Test Mode 2 "
+            } else{
                     modeTextView!!.text = "Invalid Input"
             }
 
@@ -215,7 +228,16 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             lastButtonPressed = 0
             sizeChanger(widthOrder[0])
             startButton!!.isEnabled = false
-            mHandler?.sendEmptyMessageDelayed(ALL, 0)
+            when(STATE){
+                1,2 -> {
+                    mHandler?.sendEmptyMessageDelayed(ALL, 0)
+                }
+                3,4->{
+                    secondTaskButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                    startTime = System.currentTimeMillis()
+                }
+            }
+            //mHandler?.sendEmptyMessageDelayed(ALL, 0)
            // startTime = System.currentTimeMillis()
             when(STATE){
                 1 -> {modeTextView!!.text = "Mode Click and Blow"}
@@ -494,6 +516,101 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             startTime = System.currentTimeMillis()
 
 
+
+        }
+
+
+        secondTaskButton = findViewById<View>(R.id.b12) as Button
+        secondTaskButton!!.setOnClickListener {
+            if(waitForNextClick == 0) {
+                waitForNextClick = 1
+                val stopTime = System.currentTimeMillis()
+                soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                secondTaskButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                reactionTime2.add((stopTime - startTime).toString())
+                //Button Loop Logic
+
+                secondTaskCounter += 1
+                if (secondTaskCounter > secondTaskLength - 1) {
+                    secondTaskCounter =0
+                    endOfMode = 1
+                    if (modeCounter >= selectedModeList.size - 1) {
+                        endOfTest = 1
+                        oneButton!!.isEnabled = true
+                        textView!!.text = "Press to save Data"
+                        modeTextView!!.text = "End Of Experiment"
+
+
+                    } else {
+                        modeCounter += 1
+                    }
+                    STATE = selectedModeList[modeCounter]
+                    secondTaskButton!!.isEnabled = false
+                    if (endOfTest != 1) {
+                        continueButton2!!.isEnabled = true
+                    }
+
+
+                }
+                if (endOfMode == 0) {
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        {
+                            waitForNextBlow = 0
+                            waitForNextClick = 0
+                            Log.d("LOG_TAG", "THIS IS EXECUTED")
+                            secondTaskButton!!.setBackgroundColor(
+                                Color.rgb(
+                                    3,
+                                    244,
+                                    252
+                                )
+                            ) //Turquoise
+                            startTime = System.currentTimeMillis()
+
+                        }, ((500..501).random()).toLong()
+                    ) // Wait a random time in milliseconds
+                } else {
+                    secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                }
+
+            }
+
+        }
+
+
+
+        continueButton2 = findViewById<View>(R.id.continue2) as Button
+        continueButton2!!.setOnClickListener {
+            endOfSection = 0
+            waitForNextBlow = 0
+            //enableAllButtons()
+            secondTaskButton!!.isEnabled = true
+            continueButton2!!.isEnabled = false
+            when(STATE) {
+                MODE1 -> {
+                    textView!!.text = "Click and Blow"
+                    modeTextView!!.text = "Mode Click and Blow"
+                }
+                MODE2 -> {
+                    textView!!.text = "Click "
+                    modeTextView!!.text = "Mode Only Click"
+                }
+                MODE3 -> {
+                    textView!!.text = "Blow "
+                    modeTextView!!.text = "Reaction Only Blow"
+                }
+                MODE4 -> {
+                    textView!!.text = "Click "
+                    modeTextView!!.text = "Reaction Only Click"
+                }
+            }
+
+            if(endOfMode == 1 ){
+                endOfMode = 0
+            }
+
+            secondTaskButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+            startTime = System.currentTimeMillis()
 
         }
 
@@ -1926,8 +2043,57 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     MODE3 ->{
                         if(waitForNextBlow == 0) {
                             waitForNextBlow =1
+                            this@MainActivity.runOnUiThread(java.lang.Runnable {
+                                val stopTime = System.currentTimeMillis()
+                                soundPool.play(sound, 1F, 1F, 1, 0, 1F)
+                                secondTaskButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                reactionTime1.add((stopTime - startTime).toString())
+                                //counting logic
+                                secondTaskCounter +=1
+                                if (secondTaskCounter > secondTaskLength - 1) {
+                                    secondTaskCounter =0
+                                    endOfMode = 1
+                                    if(modeCounter>= selectedModeList.size-1){
+                                        endOfTest = 1
+                                        oneButton!!.isEnabled = true
+                                        textView!!.text = "Press to save Data"
+                                        modeTextView!!.text = "End Of Experiment"
 
 
+                                    }else{
+                                        modeCounter+=1
+                                    }
+                                    STATE = selectedModeList[modeCounter]
+                                    secondTaskButton!!.isEnabled = false
+                                    if(endOfTest != 1){
+                                        continueButton2!!.isEnabled = true
+                                    }
+
+
+                                }
+                                if (endOfMode == 0) {
+                                    Handler(Looper.getMainLooper()).postDelayed(
+                                        {
+                                            waitForNextBlow = 0
+                                            Log.d("LOG_TAG", "THIS IS EXECUTED")
+                                            secondTaskButton!!.setBackgroundColor(
+                                                Color.rgb(
+                                                    3,
+                                                    244,
+                                                    252
+                                                )
+                                            ) //Turquoise
+                                            startTime = System.currentTimeMillis()
+
+                                        }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                } else {
+                                    secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                }
+                            })
+
+
+
+/*
                             this@MainActivity.runOnUiThread(java.lang.Runnable {
                                 val stopTime = System.currentTimeMillis()
                                 var blowButtonid = buttonsOrder[counter]
@@ -1958,7 +2124,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 } else {
                                     button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
                                 }
-                            })
+                            }) */
 
 
                         }
