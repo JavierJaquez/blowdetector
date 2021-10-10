@@ -177,6 +177,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         startRecording()
         startRecognition()
         val idText = findViewById<View>(R.id.editText) as EditText
+        val circleLayout = findViewById<View>(R.id.CircleLayout) as LinearLayout
+
 
         //Id Button
         idButton = findViewById<View>(R.id.buttonId) as Button?
@@ -747,6 +749,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
+
                     }
                 }
             }
@@ -847,6 +858,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -946,6 +965,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1042,6 +1069,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1138,6 +1173,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1235,6 +1278,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1331,6 +1382,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1427,6 +1486,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     }
                     MotionEvent.ACTION_UP -> {
                         view.performClick()
+                        when(STATE){
+                            MODE0,MODE1 ->{
+                                if(currentButtonToPress == lastButtonPressed){
+                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    lastButtonPressed = 0
+                                }
+                            }
+                        }
                     }
                 }
             }
