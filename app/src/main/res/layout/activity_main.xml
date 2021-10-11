@@ -46,7 +46,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="Practice Mode"
+            android:text="Test Mode"
             android:textAlignment="center"
             android:textSize="20sp" />
         <TextView
@@ -56,7 +56,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="Practice.When ready press Start"
+            android:text="Test.When ready press Start"
             android:textAlignment="center"
             android:textSize="20sp" />
 
@@ -89,7 +89,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <io.github.francoiscampbell.circlelayout.CircleLayout
             android:layout_width="match_parent"
@@ -177,11 +177,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/secondTaskLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
 
         <Button
