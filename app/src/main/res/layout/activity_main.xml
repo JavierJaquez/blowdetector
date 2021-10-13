@@ -24,13 +24,13 @@
             android:inputType="number"
             android:padding="20dp"
             android:visibility="visible" />
+
         <Button
             android:id="@+id/buttonId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send"
             android:layout_alignParentRight="true"
-            />
+            android:text="Send" />
     </RelativeLayout>
 
     <LinearLayout
@@ -56,10 +56,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="Test.When ready press Start"
+            android:text="Test.When ready press Practice"
             android:textAlignment="center"
             android:textSize="20sp" />
-
 
 
         <Button
@@ -69,7 +68,8 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="10dp"
             android:enabled="false"
-            android:text="start" />
+            android:text="Practice"
+            android:visibility="gone" />
 
 
         <Button
@@ -79,7 +79,8 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="10dp"
             android:enabled="false"
-            android:text="Save" />
+            android:text="Save"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -91,22 +92,25 @@
         android:orientation="vertical"
         android:visibility="visible">
 
+        <Button
+            android:id="@+id/two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_margin="10dp"
+            android:enabled="false"
+
+            android:text="Continue"
+            android:visibility="gone" />
+
         <io.github.francoiscampbell.circlelayout.CircleLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible"
-            app:cl_centerView="@+id/two"
+
             app:cl_direction="clockwise">
 
-            <Button
-                android:id="@+id/two"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:layout_marginBottom="10dp"
-                android:enabled="false"
 
-                android:text="Continue" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/b1"
@@ -197,8 +201,8 @@
 
         <Button
             android:id="@+id/b12"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginBottom="10dp"
 

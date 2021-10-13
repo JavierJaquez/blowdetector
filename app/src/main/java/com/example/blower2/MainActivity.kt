@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var b8: Button? = null
 
     private val buttonsIds = listOf(R.id.b1,R.id.b2,R.id.b3,R.id.b4,R.id.b5,R.id.b6,R.id.b7,R.id.b8)
-    private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,2,7,3,0,4,1,5,2,6)
+    private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,7,3,0,4,1,5,2,6)
     private val modeList1 = arrayOf(5,1,6,2,7,3,8,4)
     private val modeList2 = arrayOf(6,2,5,1,8,4,7,3)
     private val testMode1 = arrayOf(7,3,8,4,5,1,6,2)
@@ -189,20 +189,37 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         startRecognition()
         val idText = findViewById<View>(R.id.editText) as EditText
         val circleLayout = findViewById<View>(R.id.CircleLayout) as LinearLayout
+        circleLayout!!.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        Log.d("LOG_TAG","this has been touched")
+                    }//Do Something
+                }
+
+                return v?.onTouchEvent(event) ?: true
+            }
+        })
 
 
-        //Id Button
+          //Id Button
         idButton = findViewById<View>(R.id.buttonId) as Button?
         idButton!!.setOnClickListener {
             var strValue = idText.text.toString()
             if(strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "1"  ){
                 selectedModeList = modeList1
                 modeTextView!!.text = "Mode 1 selected"
+                idButton!!.visibility = View.INVISIBLE
+                idButton!!.isEnabled = false
+                startButton!!.visibility = View.VISIBLE
                 startButton!!.isEnabled = true
             } else if (strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "2" ){
                 selectedModeList = modeList2
+                startButton!!.visibility = View.VISIBLE
                 startButton!!.isEnabled = true
                 modeTextView!!.text = "Mode 2 selected"
+                idButton!!.visibility = View.INVISIBLE
+                idButton!!.isEnabled = false
             }else if (strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "3" ){
                 selectedModeList = testMode1
                 startButton!!.isEnabled = true
@@ -235,6 +252,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             practiceCounter = 0
             sizeChanger(widthOrder[0])
             startButton!!.isEnabled = false
+            startButton!!.visibility = View.GONE
+            continueButton!!.visibility = View.VISIBLE
             when(STATE){
                 1,2,5,6 -> {
                     mHandler?.sendEmptyMessageDelayed(ALL, 0)
@@ -326,56 +345,56 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     var centerX2 = centerPointsX3[1]
                     var centerY2 = centerPointsY3[1]
                      radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths[condition] = calculateSD(euclideanList.slice(0..18))*4.133
+                    stdWidths[condition] = calculateSD(euclideanList.slice(0..17))*4.133
                     //Mode2
                     centerX = centerPointsX4[0]
                     centerY = centerPointsY4[0]
                     centerX2 = centerPointsX4[1]
                     centerY2 = centerPointsY4[1]
                     radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths2[condition] = calculateSD(euclideanList2.slice(0..18))*4.133
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(0..17))*4.133
                 }else if (condition ==1){
-                    var centerX = centerPointsX3[19]
-                    var centerY = centerPointsY3[19]
-                    var centerX2 = centerPointsX3[20]
-                    var centerY2 = centerPointsY3[20]
+                    var centerX = centerPointsX3[18]
+                    var centerY = centerPointsY3[18]
+                    var centerX2 = centerPointsX3[19]
+                    var centerY2 = centerPointsY3[19]
                     radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths[condition] = calculateSD(euclideanList.slice(19..37))*4.133
+                    stdWidths[condition] = calculateSD(euclideanList.slice(18..35))*4.133
                     //Mode2
-                    centerX = centerPointsX4[19]
-                    centerY = centerPointsY4[19]
-                    centerX2 = centerPointsX4[20]
-                    centerY2 = centerPointsY4[20]
+                    centerX = centerPointsX4[18]
+                    centerY = centerPointsY4[18]
+                    centerX2 = centerPointsX4[19]
+                    centerY2 = centerPointsY4[19]
                     radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths2[condition] = calculateSD(euclideanList2.slice(19..37))*4.133
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(18..35))*4.133
                 } else if (condition ==2){
-                    var centerX = centerPointsX3[38]
-                    var centerY = centerPointsY3[38]
-                    var centerX2 = centerPointsX3[39]
-                    var centerY2 = centerPointsY3[39]
+                    var centerX = centerPointsX3[36]
+                    var centerY = centerPointsY3[36]
+                    var centerX2 = centerPointsX3[37]
+                    var centerY2 = centerPointsY3[37]
                     radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths[condition] = calculateSD(euclideanList.slice(38..56))*4.133
+                    stdWidths[condition] = calculateSD(euclideanList.slice(36..53))*4.133
                     //Mode2
-                    centerX = centerPointsX4[38]
-                    centerY = centerPointsY4[38]
-                    centerX2 = centerPointsX4[39]
-                    centerY2 = centerPointsY4[39]
+                    centerX = centerPointsX4[36]
+                    centerY = centerPointsY4[36]
+                    centerX2 = centerPointsX4[37]
+                    centerY2 = centerPointsY4[37]
                     radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths2[condition] = calculateSD(euclideanList2.slice(38..56))*4.133
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(36..53))*4.133
                 }else if (condition ==3){
-                    var centerX = centerPointsX3[57]
-                    var centerY = centerPointsY3[57]
-                    var centerX2 = centerPointsX3[58]
-                    var centerY2 = centerPointsY3[58]
+                    var centerX = centerPointsX3[54]
+                    var centerY = centerPointsY3[54]
+                    var centerX2 = centerPointsX3[55]
+                    var centerY2 = centerPointsY3[55]
                     radialDist = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths[condition] = calculateSD(euclideanList.slice(57 until euclideanList.size))*4.133
+                    stdWidths[condition] = calculateSD(euclideanList.slice(54 until euclideanList.size))*4.133
                     //Mode2
-                    centerX = centerPointsX4[57]
-                    centerY = centerPointsY4[57]
-                    centerX2 = centerPointsX4[58]
-                    centerY2 = centerPointsY4[58]
+                    centerX = centerPointsX4[54]
+                    centerY = centerPointsY4[54]
+                    centerX2 = centerPointsX4[55]
+                    centerY2 = centerPointsY4[55]
                     radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
-                    stdWidths2[condition] = calculateSD(euclideanList2.slice(57 until euclideanList.size))*4.133
+                    stdWidths2[condition] = calculateSD(euclideanList2.slice(54 until euclideanList.size))*4.133
         }
                 if(condition <= stdWidths.size -1){
                     iDe.add(log2(radialDist/stdWidths[condition]+1).toString())
@@ -387,15 +406,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             var TP = DoubleArray(timeList.size)
             var counterTP = 0
             for(time in timeList){
-                if(counterTP in 0..18 ){
+                if(counterTP in 0..17 ){
                     TP[counterTP] = (iDe[0].toDouble()/timeList[counterTP].toDouble())*1000
-                }else if (counterTP in 19..37){
+                }else if (counterTP in 18..35){
                     TP[counterTP] = (iDe[1].toDouble()/timeList[counterTP].toDouble())*1000
 
-                }else if (counterTP in 38..56){
+                }else if (counterTP in 36..53){
                     TP[counterTP] = (iDe[2].toDouble()/timeList[counterTP].toDouble())*1000
 
-                }else if (counterTP in 57 until timeList.size){
+                }else if (counterTP in 54 until timeList.size){
                     TP[counterTP] = (iDe[3].toDouble()/timeList[counterTP].toDouble())*1000
 
                 }
@@ -409,15 +428,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             var TP2 = DoubleArray(timeList2.size)
             var counterTP2 = 0
             for(time in timeList2){
-                if(counterTP2 in 0..18 ){
+                if(counterTP2 in 0..17 ){
                     TP2[counterTP2] = (iDe2[0].toDouble()/timeList2[counterTP2].toDouble())*1000
-                }else if (counterTP2 in 19..37){
+                }else if (counterTP2 in 18..35){
                     TP2[counterTP2] = (iDe2[1].toDouble()/timeList2[counterTP2].toDouble())*1000
 
-                }else if (counterTP2 in 38..56){
+                }else if (counterTP2 in 36..53){
                     TP2[counterTP2] = (iDe2[2].toDouble()/timeList2[counterTP2].toDouble())*1000
 
-                }else if (counterTP2 in 57 until timeList2.size){
+                }else if (counterTP2 in 54 until timeList2.size){
                     TP2[counterTP2] = (iDe2[3].toDouble()/timeList2[counterTP2].toDouble())*1000
 
                 }
@@ -591,6 +610,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                             endOfMode = 1
                             if (modeCounter >= selectedModeList.size - 1) {
                                 endOfTest = 1
+                                continueButton2!!.visibility = View.GONE
+                                oneButton!!.visibility = View.VISIBLE
                                 oneButton!!.isEnabled = true
                                 textView!!.text = "Press to save Data"
                                 modeTextView!!.text = "End Of Experiment"
@@ -2005,7 +2026,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 counter2 = 0
                 if(modeCounter>= selectedModeList.size-1){
                     endOfTest = 1
+                    continueButton2!!.visibility = View.GONE
+                    oneButton!!.visibility = View.VISIBLE
                     oneButton!!.isEnabled = true
+
                     textView!!.text = "Press to save Data"
                     modeTextView!!.text = "End Of Experiment"
 
@@ -2353,7 +2377,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     endOfMode = 1
                                     if(modeCounter>= selectedModeList.size-1){
                                         endOfTest = 1
+                                        continueButton2!!.visibility = View.GONE
+
                                         oneButton!!.isEnabled = true
+                                        oneButton!!.visibility= View.VISIBLE
                                         textView!!.text = "Press to save Data"
                                         modeTextView!!.text = "End Of Experiment"
 
