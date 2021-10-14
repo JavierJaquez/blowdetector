@@ -130,7 +130,11 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val centerPointsY3: MutableList<String> = ArrayList()//Mode1
     private val centerPointsX4: MutableList<String> = ArrayList()
     private val centerPointsY4: MutableList<String> = ArrayList()//Mode2
-
+    private var xCoordGlobal : Float = 0.0F
+    private var yCoordGlobal: Float = 0.0F
+    private var centerButtonPointsX:Int = 0
+    private var centerButtonPointsY:Int = 0
+    private var centerDistanceGlobal:Float = 0.0F
     private val clicksX: MutableList<String> = ArrayList() //MODE1
     private val clicksY: MutableList<String> = ArrayList()
     private val clicksX2: MutableList<String> = ArrayList() //MODE2
@@ -1008,6 +1012,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
+
+                                    /*
                                     if(waitForConfirmation == 0){
                                         waitForConfirmation = 1
                                         vibrator.vibrate(durationInMilliSeconds)
@@ -1017,7 +1029,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                         centerPointsY3.add(centerButtonPoints!!.y.toString())
                                         centerDistList.add(centerDistance.toString())
                                         pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    } */
 
                                 }
                             }
@@ -1121,16 +1133,12 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
-                                    if(waitForConfirmation == 0){
-                                        waitForConfirmation = 1
-                                        vibrator.vibrate(durationInMilliSeconds)
-                                        clicksX.add(xCoord.toString())
-                                        clicksY.add(yCoord.toString())
-                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
-                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
-                                        centerDistList.add(centerDistance.toString())
-                                        pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
                                 }
                             }
                             MODE2 -> {
@@ -1222,16 +1230,12 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    if(waitForConfirmation == 0){
-                                        waitForConfirmation = 1
-                                        vibrator.vibrate(durationInMilliSeconds)
-                                        clicksX.add(xCoord.toString())
-                                        clicksY.add(yCoord.toString())
-                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
-                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
-                                        centerDistList.add(centerDistance.toString())
-                                        pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
                                 }
                             }
                             MODE2 -> {
@@ -1320,16 +1324,12 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    if(waitForConfirmation == 0){
-                                        waitForConfirmation = 1
-                                        vibrator.vibrate(durationInMilliSeconds)
-                                        clicksX.add(xCoord.toString())
-                                        clicksY.add(yCoord.toString())
-                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
-                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
-                                        centerDistList.add(centerDistance.toString())
-                                        pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
                                 }
                             }
                             MODE2 -> {
@@ -1415,16 +1415,12 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    if(waitForConfirmation == 0){
-                                        waitForConfirmation = 1
-                                        vibrator.vibrate(durationInMilliSeconds)
-                                        clicksX.add(xCoord.toString())
-                                        clicksY.add(yCoord.toString())
-                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
-                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
-                                        centerDistList.add(centerDistance.toString())
-                                        pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
                                 }
                             }
                             MODE2 -> {
@@ -1511,16 +1507,12 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    if(waitForConfirmation == 0){
-                                        waitForConfirmation = 1
-                                        vibrator.vibrate(durationInMilliSeconds)
-                                        clicksX.add(xCoord.toString())
-                                        clicksY.add(yCoord.toString())
-                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
-                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
-                                        centerDistList.add(centerDistance.toString())
-                                        pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
                                 }
                             }
                             MODE2 -> {
@@ -1606,16 +1598,12 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    if(waitForConfirmation == 0){
-                                        waitForConfirmation = 1
-                                        vibrator.vibrate(durationInMilliSeconds)
-                                        clicksX.add(xCoord.toString())
-                                        clicksY.add(yCoord.toString())
-                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
-                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
-                                        centerDistList.add(centerDistance.toString())
-                                        pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
                                 }
                             }
                             MODE2 -> {
@@ -1702,16 +1690,12 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                                    if(waitForConfirmation == 0){
-                                        waitForConfirmation = 1
-                                        vibrator.vibrate(durationInMilliSeconds)
-                                        clicksX.add(xCoord.toString())
-                                        clicksY.add(yCoord.toString())
-                                        centerPointsX3.add(centerButtonPoints!!.x.toString())
-                                        centerPointsY3.add(centerButtonPoints!!.y.toString())
-                                        centerDistList.add(centerDistance.toString())
-                                        pressedButtonList.add(lastButtonPressed.toString())
-                                    }
+                                    vibrator.vibrate(durationInMilliSeconds)
+                                    xCoordGlobal = xCoord
+                                    yCoordGlobal = yCoord
+                                    centerButtonPointsX = centerButtonPoints!!.x
+                                    centerButtonPointsY = centerButtonPoints!!.y
+                                    centerDistanceGlobal = centerDistance
                                 }
                             }
                             MODE2 -> {
@@ -2152,6 +2136,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
                                 //pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
                                 timeList.add((stopTime - startTime).toString())
+                                clicksX.add(xCoordGlobal.toString())
+                                clicksY.add(yCoordGlobal.toString())
+                                centerPointsX3.add(centerButtonPointsX.toString())
+                                centerPointsY3.add(centerButtonPointsY.toString())
+                                centerDistList.add(centerDistanceGlobal.toString())
+                                pressedButtonList.add(lastButtonPressed.toString())
+
+
                                 // mHandler?.sendEmptyMessageDelayed(PURPLE, buttondelay);
                                 lastButtonPressed = 0
                                 counter += 1
