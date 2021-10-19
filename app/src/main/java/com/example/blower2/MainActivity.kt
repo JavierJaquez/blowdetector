@@ -35,9 +35,7 @@ import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.math.sqrt
 import android.widget.EditText
-
-
-
+import org.apache.commons.lang3.RandomUtils.nextInt
 
 
 class MainActivity : AppCompatActivity(), View.OnTouchListener {
@@ -59,14 +57,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private var b8: Button? = null
 
     private val buttonsIds = listOf(R.id.b1,R.id.b2,R.id.b3,R.id.b4,R.id.b5,R.id.b6,R.id.b7,R.id.b8)
-    private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,7,3,0,4,1,5,2,6)
+    private val buttonsOrder = arrayOf(6,2,7,3,0,4,1,5,2,6,3,7,4,0,5,1,6,2)
+
     private val modeList1 = arrayOf(5,1,6,2,7,3,8,4,10,9)
     private val modeList2 = arrayOf(6,2,5,1,8,4,7,3,10,9)
     private val modeList3 = arrayOf(5,1,6,2,7,3,10,9,8,4)
     private val modeList4 = arrayOf(6,2,5,1,8,4,10,9,7,3)
     private val modeList5 = arrayOf(5,1,6,2,10,9,7,3,8,4)
     private val modeList6 = arrayOf(6,2,5,1,10,9,8,4,7,3)
-    private val testMode1 = arrayOf(7,3,8,4,5,1,6,2)
+    private val testMode1 = arrayOf(7,3,8,4,10,9,5,1,6,2)
     private val testMode2 = arrayOf(4,3,1,2)
     private var selectedModeList = arrayOf(0,0,0,0)
     //private var buttons:ArrayList<Button>? = null
@@ -153,6 +152,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     private val euclidianDistList: MutableList<String> = ArrayList()
     private val iDe: MutableList<String> = ArrayList()
     private val iDe2: MutableList<String> = ArrayList()
+    private var iDeFloat = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
+    private var iDeFloat2 = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
     private var startTime: Long = 0
     private val durationInMilliSeconds: Long = 100 //Vibration Duration
     private lateinit var soundPool: SoundPool
@@ -186,7 +187,10 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     val MODE10 = 10
     var STATE = 0
 
-    val buttondelay: Long= 400// in Milliseconds
+    //val buttondelay: Long= 400// in Milliseconds
+    val startRandom = 1500 // starting time of the random time function
+    val endRandom = 4000
+    var randomSeed =  Random(50)
 
 
 
@@ -268,7 +272,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 modeTextView!!.text = "Mode 6 selected"
                 idButton!!.visibility = View.INVISIBLE
                 idButton!!.isEnabled = false
-            } else{
+            } else if (strValue[strValue.length-2].toString() == "0" && strValue[strValue.length-1].toString() == "7" ){
+                selectedModeList = testMode1
+                startButton!!.visibility = View.VISIBLE
+                startButton!!.isEnabled = true
+                modeTextView!!.text = "Test MODE 1 SELECTED"
+                idButton!!.visibility = View.INVISIBLE
+                idButton!!.isEnabled = false
+            }else{
                     modeTextView!!.text = "Invalid Input"
             }
 
@@ -373,7 +384,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             //Log.d(LOG_TAG, euclideanList.size.toString())
             //Log.d(LOG_TAG, centerPointsX.size.toString())
-
+            var i = 0
             for( condition in 0 until widthOrder.size){
                 var radialDist = 0.0F
                 var radialDist2 = 0.0F
@@ -436,13 +447,23 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     radialDist2 = sqrt((centerX.toFloat() - centerX2.toFloat()).pow(2) +(centerY.toFloat() - centerY2.toFloat().toFloat()).pow(2))
                     stdWidths2[condition] = calculateSD(euclideanList2.slice(54 until euclideanList.size))*4.133
         }
+
                 if(condition <= stdWidths.size -1){
                     iDe.add(log2(radialDist/stdWidths[condition]+1).toString())
+                    iDeFloat[i] = log2(radialDist/stdWidths[condition]+1)
+
                     iDe2.add(log2(radialDist2/stdWidths2[condition]+1).toString())
+                    iDeFloat2[i] = log2(radialDist2/stdWidths2[condition]+1)
+                    i+=1
                 }
 
 
+
             }
+            Log.d(LOG_TAG, iDe.toString())
+            Log.d(LOG_TAG, iDeFloat.contentToString())
+            var averageiDe1 = iDeFloat.average()
+            var averageiDe2 = iDeFloat2.average()
             var TP = DoubleArray(timeList.size)
             var counterTP = 0
             for(time in timeList){
@@ -487,10 +508,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
             }
 
+
+
             var reactionTime1Float = FloatArray(reactionTime1.size)
             var reactionTime2Float = FloatArray(reactionTime2.size)
             var reactionTime3Float = FloatArray(reactionTime3.size)
             var Time2Float = FloatArray(timeList2.size)
+            var Time1Float = FloatArray(timeList.size)
             for(time in reactionTime1Float.indices){
                 reactionTime1Float[time] = reactionTime1[time].toFloat()
             }
@@ -501,13 +525,21 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 reactionTime3Float[time] = reactionTime3[time].toFloat()
             }
             //TO calculate average time of Mode 2
+            for(time in Time1Float.indices){
+                Time1Float[time] = timeList[time].toFloat()
+            }
+
+            //TO calculate average time of Mode 2
             for(time in Time2Float.indices){
                 Time2Float[time] = timeList2[time].toFloat()
             }
             var averageReactionTime1 = reactionTime1Float.average()
             var averageReactionTime2 = reactionTime2Float.average()
             var averageReactionTime3 = reactionTime3Float.average()
-            var averageTime = Time2Float.average()
+            var averageTime1 = Time1Float.average()
+            var averageTime2 = Time2Float.average()
+            var TPAverage1 = (averageiDe1/averageTime1)*1000
+            var TPAverage2 = (averageiDe2/averageTime2)*1000
 
             // Sending data to csv file
             var averageTp = arrayOf(TP.average().toString())
@@ -532,6 +564,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             data.add(centerPointsX3.toTypedArray())
             data.add(centerPointsY3.toTypedArray())
             data.add(averageTp)
+            data.add(arrayOf(TPAverage1.toString()))
 
             //Mode2
             data.add(clicksX2.toTypedArray())
@@ -542,6 +575,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             data.add(centerPointsX4.toTypedArray())
             data.add(centerPointsY4.toTypedArray())
             data.add(averageTp2)
+            data.add(arrayOf(TPAverage2.toString()))
 
             //Mode 3
             data.add(reactionTime1.toTypedArray())
@@ -554,8 +588,15 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             data.add(arrayOf((averageReactionTime3/1000).toString()))
 
 
-            data.add(arrayOf((averageTime/1000).toString()))
-
+            data.add(arrayOf((averageTime2/1000).toString()))
+            data.add(arrayOf(mode1MissClick.toString()))
+            data.add(arrayOf(mode2MissClick.toString()))
+            data.add(arrayOf(blowWithOutClick.toString()))
+            data.add(arrayOf(clickWithOutBlow.toString()))
+            //data.add(iDe.toTypedArray())
+           // data.add(iDe2.toTypedArray())
+            //Log.d(LOG_TAG, iDe.toString())
+            //Log.d(LOG_TAG, iDeFloat.contentToString())
             var fileName = idText.text.toString()
 
             val writer = CSVWriter(FileWriter(csv + "/"+fileName+".csv"))
@@ -721,7 +762,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     ) //Turquoise
                                     startTime = System.currentTimeMillis()
 
-                                }, ((500..501).random()).toLong()
+                                }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()
                             ) // Wait a random time in milliseconds
                         } else {
                             secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
@@ -751,7 +792,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                         )
                                     ) //Turquoise
 
-                                }, ((500..501).random()).toLong()
+                                }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()
                             ) // Wait a random time in milliseconds
                         } else {
                             secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
@@ -1018,7 +1059,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
-
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                     /*
                                     if(waitForConfirmation == 0){
                                         waitForConfirmation = 1
@@ -1104,6 +1146,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
                                 }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
+                                }
                             }
                         }
 
@@ -1139,6 +1184,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                 }
                             }
                             MODE2 -> {
@@ -1202,6 +1249,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
                                 }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
+                                }
                             }
                         }
                     }
@@ -1236,6 +1286,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                 }
                             }
                             MODE2 -> {
@@ -1297,6 +1349,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
                                 }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
+                                }
                             }
                         }
                     }
@@ -1318,6 +1373,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.parseColor("#FFBB86FC"))
                                     val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
                                     vibrator.vibrate(durationInMilliSeconds)
+
                                 }
                             }
                             MODE1->{
@@ -1330,6 +1386,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                 }
                             }
                             MODE2 -> {
@@ -1387,6 +1445,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
+                                }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
                                 }
                             }
                         }
@@ -1421,6 +1482,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                 }
                             }
                             MODE2 -> {
@@ -1478,6 +1541,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if(currentButtonToPress == lastButtonPressed){
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
+                                }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
                                 }
                             }
                         }
@@ -1513,6 +1579,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                 }
                             }
                             MODE2 -> {
@@ -1571,6 +1639,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
                                 }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
+                                }
                             }
                         }
                     }
@@ -1604,6 +1675,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                 }
                             }
                             MODE2 -> {
@@ -1663,6 +1736,9 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
                                 }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
+                                }
                             }
                         }
                     }
@@ -1696,6 +1772,8 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     centerButtonPointsX = centerButtonPoints!!.x
                                     centerButtonPointsY = centerButtonPoints!!.y
                                     centerDistanceGlobal = centerDistance
+                                    if(waitForConfirmation == 0){
+                                        waitForConfirmation = 1}
                                 }
                             }
                             MODE2 -> {
@@ -1755,7 +1833,11 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
                                     lastButtonPressed = 0
                                 }
+                                if(STATE == MODE1 && waitForNextBlow == 1){
+                                    clickWithOutBlow +=1
+                                }
                             }
+
                         }
                     }
                 }
@@ -2204,6 +2286,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
 
 
                             }else{
+
                                 blowWithOutClick+=1
                             }
                         })
@@ -2262,7 +2345,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                             ) //Turquoise
                                             startTime = System.currentTimeMillis()
 
-                                        }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                        }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()) // Wait a random time in milliseconds
                                 } else {
                                     secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
                                 }
@@ -2360,7 +2443,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                             ) //Turquoise
 
 
-                                        }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
+                                        }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()) // Wait a random time in milliseconds
                                 } else {
                                     secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
                                 }
