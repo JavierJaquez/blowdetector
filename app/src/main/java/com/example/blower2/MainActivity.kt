@@ -191,6 +191,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
     val startRandom = 1500 // starting time of the random time function
     val endRandom = 4000
     var randomSeed =  Random(50)
+    var randomSeed2 =  Random(42)
 
 
 
@@ -310,7 +311,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     mHandler?.sendEmptyMessageDelayed(ALL, 0)
                 }
                 3,4->{
-                    secondTaskButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                    secondTaskButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                     startTime = System.currentTimeMillis()
                 }
             }
@@ -688,7 +689,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 endOfMode = 0
             }
 
-            b7!!.setBackgroundColor(Color.rgb(3, 244, 252))
+            b7!!.setBackgroundColor(Color.rgb(2, 252, 115))
             startTime = System.currentTimeMillis()
 
             if(halfPointReached == 1){
@@ -696,7 +697,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 val secondTaskLayoutV = findViewById<View>(R.id.secondTaskLayout) as LinearLayout
                 circleLayoutV!!.visibility = View.GONE
                 secondTaskLayoutV!!.visibility = View.VISIBLE
-                secondTaskButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                secondTaskButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                 startTime = System.currentTimeMillis()
                 halfPointReached =0
             }
@@ -710,15 +711,19 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         secondTaskButton!!.setOnClickListener {
             when(STATE) {
                 MODE4,MODE9 -> {
+
                     if (waitForNextClick == 0) {
                         waitForNextClick = 1
                         val stopTime = System.currentTimeMillis()
                         soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                        secondTaskButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                        secondTaskButton?.setBackgroundColor(Color.rgb(170, 170, 170)) //PURPLE
                         if(STATE == MODE4){
-                        reactionTime2.add((stopTime - startTime).toString())}
+                        reactionTime2.add((stopTime - startTime).toString())
+
+                        }
                         else{
                             reactionTime3.add((stopTime - startTime).toString())
+
                         }
                         //Button Loop Logic
 
@@ -755,9 +760,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     Log.d("LOG_TAG", "THIS IS EXECUTED")
                                     secondTaskButton!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         )
                                     ) //Turquoise
                                     startTime = System.currentTimeMillis()
@@ -765,7 +768,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()
                             ) // Wait a random time in milliseconds
                         } else {
-                            secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                            secondTaskButton!!.setBackgroundColor(Color.rgb(170, 170, 170))//Purple
                         }
 
                     }
@@ -776,7 +779,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         waitForNextClick = 1
 
                         soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                        secondTaskButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                        secondTaskButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                         continueButton2!!.isEnabled = true
                         if (endOfMode == 0) {
                             Handler(Looper.getMainLooper()).postDelayed(
@@ -786,16 +789,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     Log.d("LOG_TAG", "THIS IS EXECUTED")
                                     secondTaskButton!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         )
                                     ) //Turquoise
 
-                                }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()
+                                }, (randomSeed2.nextInt((endRandom+1)-startRandom)+startRandom).toLong()
                             ) // Wait a random time in milliseconds
                         } else {
-                            secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                            secondTaskButton!!.setBackgroundColor(Color.rgb(170,170,170))//Purple
                         }
 
                     }
@@ -877,7 +878,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 endOfMode = 0
             }
 
-            secondTaskButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+            secondTaskButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
             startTime = System.currentTimeMillis()
 
         }
@@ -918,15 +919,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                 when (msg.what) {
 
                     PURPLE -> {
-                        pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238))
+                        pressedButton?.setBackgroundColor(Color.rgb(170,170,170))
                         //mHandler?.sendEmptyMessageDelayed(YELLOW, buttondelay)
                     }
                     TURQUOISE ->{
                         b7!!.setBackgroundColor(
                             Color.rgb(
-                                3,
-                                244,
-                                252
+                                2, 252, 115
                             ))
                         startTime = System.currentTimeMillis()
 
@@ -934,7 +933,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     ALL -> {
                         for (id in buttonsIds) {
                             val button = findViewById<View>(id) as Button
-                            button.setBackgroundColor(Color.rgb(98, 0, 238))
+                            button.setBackgroundColor(Color.rgb(170,170,170))
                         }
                         mHandler?.sendEmptyMessageDelayed(TURQUOISE, 100)
 
@@ -942,7 +941,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                     ALL2 ->{
                         for (id in buttonsIds) {
                             val button = findViewById<View>(id) as Button
-                            button.setBackgroundColor(Color.rgb(98, 0, 238))
+                            button.setBackgroundColor(Color.rgb(170,170,170))
                         }
                     }
 
@@ -1017,9 +1016,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
         }
         b7!!.setBackgroundColor(
             Color.rgb(
-                3,
-                244,
-                252
+                2, 252, 115
             ))
     }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -1081,7 +1078,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1104,7 +1101,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
                                     practiceCounter += 1
                                     if (practiceCounter > buttonsOrder.size - 1) {
@@ -1115,9 +1112,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1143,7 +1138,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1193,7 +1188,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1216,7 +1211,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
                                     continueButton!!.isEnabled = true
                                     practiceCounter += 1
@@ -1229,9 +1224,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1246,7 +1239,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1295,7 +1288,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1318,7 +1311,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
                                     continueButton!!.isEnabled = true
                                     practiceCounter += 1
@@ -1330,9 +1323,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1346,7 +1337,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1395,7 +1386,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1418,7 +1409,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
                                     practiceCounter += 1
                                     if (practiceCounter > buttonsOrder.size - 1) {
@@ -1429,9 +1420,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1443,7 +1432,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1491,7 +1480,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1514,7 +1503,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
                                     practiceCounter += 1
                                     if (practiceCounter > buttonsOrder.size - 1) {
@@ -1525,9 +1514,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1539,7 +1526,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1588,7 +1575,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1611,7 +1598,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
                                     practiceCounter += 1
                                     if (practiceCounter > buttonsOrder.size - 1) {
@@ -1622,9 +1609,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1636,7 +1621,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1684,7 +1669,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1707,7 +1692,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
                                     continueButton!!.isEnabled = true
                                     practiceCounter += 1
@@ -1719,9 +1704,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1733,7 +1716,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1781,7 +1764,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 if (currentButtonToPress == lastButtonPressed) {
                                     val stopTime = System.currentTimeMillis()
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     timeList2.add((stopTime - startTime).toString())
                                     clicksX2.add(xCoord.toString())
                                     clicksY2.add(yCoord.toString())
@@ -1804,7 +1787,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 currentButtonToPress = buttonsOrder[practiceCounter] + 1
                                 if (currentButtonToPress == lastButtonPressed) {
                                     soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                    pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                    pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                     lastButtonPressed = 0
 
                                     practiceCounter += 1
@@ -1816,9 +1799,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                     button!!.setBackgroundColor(
                                         Color.rgb(
-                                            3,
-                                            244,
-                                            252
+                                            2, 252, 115
                                         ))//Turquoise
                                 }
                             }
@@ -1830,7 +1811,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         when(STATE){
                             MODE0,MODE1,MODE5 ->{
                                 if(currentButtonToPress == lastButtonPressed){
-                                    pressedButton!!.setBackgroundColor(Color.rgb(3, 244, 252))
+                                    pressedButton!!.setBackgroundColor(Color.rgb(2, 252, 115))
                                     lastButtonPressed = 0
                                 }
                                 if(STATE == MODE1 && waitForNextBlow == 1){
@@ -1994,15 +1975,13 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
             if (endOfSection == 0) {
                 button!!.setBackgroundColor(
                     Color.rgb(
-                        3,
-                        244,
-                        252
+                        2, 252, 115
                     )
                 ) //Turquoise
                 startTime = System.currentTimeMillis()
 
             } else {
-                button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                button!!.setBackgroundColor(Color.rgb(170,170,170))//Purple
             }
         }
 
@@ -2188,7 +2167,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         this@MainActivity.runOnUiThread(java.lang.Runnable {
                             if (currentButtonToPress == lastButtonPressed) {
                                 soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                 lastButtonPressed = 0
                                 practiceCounter += 1
                                 if (practiceCounter > buttonsOrder.size - 1) {
@@ -2199,9 +2178,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                 button!!.setBackgroundColor(
                                     Color.rgb(
-                                        3,
-                                        244,
-                                        252
+                                        2, 252, 115
                                     ))//Turquoise
                             }
                         }) }
@@ -2215,7 +2192,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 val stopTime = System.currentTimeMillis()
 
                                 soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                 //pressedButton?.setBackgroundColor(Color.rgb(0, 255, 0))
                                 timeList.add((stopTime - startTime).toString())
                                 clicksX.add(xCoordGlobal.toString())
@@ -2272,16 +2249,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                     Handler(Looper.getMainLooper()).postDelayed({
                                         button!!.setBackgroundColor(
                                             Color.rgb(
-                                                3,
-                                                244,
-                                                252
+                                                2, 252, 115
                                             )
                                         ) //Turquoise
                                         startTime = System.currentTimeMillis()
 
                                     }, 1)
                                 } else {
-                                    button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    button!!.setBackgroundColor(Color.rgb(170,170,170))//Purple
                                 }
 
 
@@ -2302,7 +2277,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                             this@MainActivity.runOnUiThread(java.lang.Runnable {
                                 val stopTime = System.currentTimeMillis()
                                 soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                secondTaskButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                secondTaskButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                 reactionTime1.add((stopTime - startTime).toString())
                                 //counting logic
                                 secondTaskCounter +=1
@@ -2338,16 +2313,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                             Log.d("LOG_TAG", "THIS IS EXECUTED")
                                             secondTaskButton!!.setBackgroundColor(
                                                 Color.rgb(
-                                                    3,
-                                                    244,
-                                                    252
+                                                    2, 252, 115
                                                 )
                                             ) //Turquoise
                                             startTime = System.currentTimeMillis()
 
                                         }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()) // Wait a random time in milliseconds
                                 } else {
-                                    secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    secondTaskButton!!.setBackgroundColor(Color.rgb(170,170,170))//Purple
                                 }
                             })
 
@@ -2359,7 +2332,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 var blowButtonid = buttonsOrder[counter]
                                 var blowButton = findViewById<View>(buttonsIds[blowButtonid ]) as Button
                                 soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                blowButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                blowButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
 
                                 reactionTime1.add((stopTime - startTime).toString())
                                 buttonLoopLogic()
@@ -2373,16 +2346,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                             Log.d("LOG_TAG", "THIS IS EXECUTED")
                                             button!!.setBackgroundColor(
                                                 Color.rgb(
-                                                    3,
-                                                    244,
-                                                    252
+                                                    2, 252, 115
                                                 )
                                             ) //Turquoise
                                             startTime = System.currentTimeMillis()
 
                                         }, ((500..501).random()).toLong()) // Wait a random time in milliseconds
                                 } else {
-                                    button!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    button!!.setBackgroundColor(Color.rgb(170,170,170))//Purple
                                 }
                             }) */
 
@@ -2397,7 +2368,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                         this@MainActivity.runOnUiThread(java.lang.Runnable {
                             if (currentButtonToPress == lastButtonPressed) {
                                 soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                pressedButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                pressedButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                 continueButton!!.isEnabled = true
                                 lastButtonPressed = 0
                                 practiceCounter += 1
@@ -2409,9 +2380,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                 var button = findViewById<View>(buttonsIds[buttonid]) as Button
                                 button!!.setBackgroundColor(
                                     Color.rgb(
-                                        3,
-                                        244,
-                                        252
+                                        2, 252, 115
                                     ))//Turquoise
                             }
                         }) }
@@ -2426,7 +2395,7 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                             this@MainActivity.runOnUiThread(java.lang.Runnable {
 
                                 soundPool.play(sound, 1F, 1F, 1, 0, 1F)
-                                secondTaskButton?.setBackgroundColor(Color.rgb(98, 0, 238)) //PURPLE
+                                secondTaskButton?.setBackgroundColor(Color.rgb(170,170,170)) //PURPLE
                                 continueButton2!!.isEnabled = true
 
                                 if (endOfMode == 0) {
@@ -2436,16 +2405,14 @@ class MainActivity : AppCompatActivity(), View.OnTouchListener {
                                             Log.d("LOG_TAG", "THIS IS EXECUTED")
                                             secondTaskButton!!.setBackgroundColor(
                                                 Color.rgb(
-                                                    3,
-                                                    244,
-                                                    252
+                                                    2, 252, 115
                                                 )
                                             ) //Turquoise
 
 
-                                        }, (randomSeed.nextInt((endRandom+1)-startRandom)+startRandom).toLong()) // Wait a random time in milliseconds
+                                        }, (randomSeed2.nextInt((endRandom+1)-startRandom)+startRandom).toLong()) // Wait a random time in milliseconds
                                 } else {
-                                    secondTaskButton!!.setBackgroundColor(Color.rgb(98, 0, 238))//Purple
+                                    secondTaskButton!!.setBackgroundColor(Color.rgb(170,170,170))//Purple
                                 }
                             })
 
