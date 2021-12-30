@@ -14,6 +14,7 @@ Two experiments were carried out.  The first was a Fitts’s law task that conta
 We believe that a fair way of comparison between the blow and tapping methods is by measuring the speed at which a user performs a given task.  Given this, we cameup  with  a  reaction  time  tasks  with  three  conditions.   In  these  tasks,  participants were presented with a big square that occupied most of the screen.  The participantshad to select the square when its color changed to green.  After a successful selection, participants had to wait for a random delay, with a time between 1500 and 4000ms, before the square was highlighted in green again.  This procedure was repeated fora total of 20 selections.
 
 The three different condition for the reaction time tasks are described below.
+
 Blow:  in this condition,  participants had to blow in other to trigger a successful selection.   The  participants  held  their  phones  in  whichever  form  or  position  wascomfortable. 
 
 Click to side:  participants were asked to hold their index finger on the side of thephone (where volume and power buttons are usually positioned).  They had to waitwith the finger in this location until the square was highlighted, then they had totap it and return to the same position.  This reaction time task was designed in thisway so that participants didn’t position their index finger directly above and closeto the target, therefore simulating a more realistic environment.
