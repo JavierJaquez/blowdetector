@@ -7,7 +7,7 @@ Two experiments were carried out.  The first was a Fitts’s law task that conta
 ## Fitts's Law
 <img src="https://github.com/JavierJaquez/blowdetector/blob/main/fitt-law-screenshot.jpg" width="15%" height="15%">
 
-Here participants were presented witha circular arrangement of buttons and had to select the one highlighted. In on the experiments participants only had to click on the highlighted target. In the other experiment participants had to indicate with a click to the highlighted circle, and a blow to confirm the selection.
+Here participants were presented with a circular arrangement of buttons and had to select the one highlighted. In on the experiments participants only had to click on the highlighted target. In the other experiment participants had to indicate with a click to the highlighted circle, and a blow to confirm the selection.
 
 ## Reaction Time Tasks
 
