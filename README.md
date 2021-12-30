@@ -1,5 +1,5 @@
 # Blowdetector
-An app used to perform a user study exploring the use of blowing as input in mobile applications.
+An app used to perform a user study exploring the use of blowing as input in mobile applications. The input to classification  subsystem is a continuos recording from the phones microphone. The signal is transformed using the MFCC library wrote by chiachunfu (https://github.com/chiachunfu/speech/blob/master/speechandroid/src/org/tensorflow/demo/mfcc/MFCC.java). This serves as input to a Convolutional Neural Network, trained with TensorFlow. The output is a binary classification of wether a blow is detected or not. This classification runs continuosly, given a result approximatly every 50ms. This result is then used by another logic in the app, which represents the implementation of the user study.
 
 # User Study
 Two experiments were carried out.  The first was a Fitts’s law task that contained two conditions.  The baseline condition involved the use of the tapping method, thesecond condition used blowing.  The second experiment includeda reaction time task with 3 conditions.  In the first experiment, 4 degrees of difficulty in decreasing order were presented for each Fitts’s law task,each containing 18 trials.  The second experiment included 20 trials for each reactiontime tasks.
